@@ -1,0 +1,39 @@
+.layout-header {
+    position: sticky;
+    top: 0;
+    z-Index: 1;
+    width: 100%;
+    display: flex;
+    align-Items: center;
+    background: white;
+
+    .ant-menu-dark {
+        color: white;
+    }
+
+    .ant-menu-title-content {
+        color: black;
+    }
+
+    .ant-menu-item-icon {
+        color: black;
+    }
+}
+
+.logo {
+    width: 200px;
+    height: 60px;
+    background: url('~@/assets/group11_icon.png') no-repeat center / 160px auto;
+}
+
+.layout-footer {
+    text-align: center;
+    background-color: white;
+    margin-block-start: 50px;
+}
+
+.layout-menu {
+    flex: 1;
+    min-width: 0;
+    font-weight: bold;
+}

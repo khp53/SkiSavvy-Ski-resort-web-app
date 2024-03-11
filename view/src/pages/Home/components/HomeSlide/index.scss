@@ -1,0 +1,48 @@
+.content-style {
+    height: 500px;
+    color: #fff;
+    line-height: 160px;
+    text-align: center;
+    background: #364d79;
+    margin-block-start: 0px;
+    margin-block-end: 20px;
+    position: relative;
+
+    .text-style1 {
+        position: absolute; // absolute positioning
+        bottom: 200px; // start at from the bottom 200px
+        left: 50%; // center horizontally
+        transform: translateX(-50%); // make sure the text centers are aligned
+        color: #fff; // text color
+        font-size: 20px; // text size
+        font-weight: bold; // Text bolding
+        padding: 5px 10px; // Text margins
+        border-radius: 5px; // border-radius
+    }
+
+    .text-style2 {
+        position: absolute; // absolute positioning
+        bottom: 150px; // start at from the bottom 150px
+        left: 50%; // center horizontally
+        transform: translateX(-50%); // make sure the text centers are aligned
+        color: #fff; // text color
+        font-size: 40px; // text size
+        font-weight: bold; // Text bolding
+        padding: 5px 10px; // Text margins
+        border-radius: 5px; // border-radius
+    }
+
+    .downOutlined-case {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: trans lateX(-50%);
+    }
+
+    .image-style {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+}
