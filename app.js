@@ -4,10 +4,11 @@ const pathRoutes = require('./routes/pathRoutes');
 const app = express();
 const port = 4000;
 
+
 app.use(express.static(path.join(__dirname, 'view/build')));
 app.use(express.json());
 
-app.get('*', (req, res) => {
+app.get('*', async (req, res) => {
 	res.sendFile(path.join(__dirname, 'view/build', 'index.html'));
 });
 
