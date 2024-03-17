@@ -19,3 +19,4 @@ class Edge {
         this.target = target;
     }
 }
+
