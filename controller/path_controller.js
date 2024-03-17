@@ -1,4 +1,4 @@
-const Path = require('../model/pathModel');
+const Path = require('../model/path_model');
 const connectDB = require('../config/db_config');
 
 exports.createPath = async (req, res) => {
