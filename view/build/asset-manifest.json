@@ -1,15 +1,21 @@
 {
   "files": {
-    "main.css": "/static/css/main.ff02f4b5.css",
-    "main.js": "/static/js/main.c5c367c5.js",
-    "static/js/453.7a8c23ee.chunk.js": "/static/js/453.7a8c23ee.chunk.js",
+    "main.css": "/static/css/main.a937a2b9.css",
+    "main.js": "/static/js/main.c1f641fa.js",
+    "static/media/findRestaurant.jpg": "/static/media/findRestaurant.2a57691b2691a48b648b.jpg",
+    "static/media/homePicture3.jpg": "/static/media/homePicture3.1aa9dd889a6977d71659.jpg",
+    "static/media/useLift.jpg": "/static/media/useLift.898dc4c03ee2f38cd46b.jpg",
+    "static/media/calculateRoute.jpg": "/static/media/calculateRoute.62e068c6a8a758defddc.jpg",
+    "static/media/homePicture2.jpg": "/static/media/homePicture2.48ed93986faaf1a8db03.jpg",
+    "static/media/homePicture4.jpg": "/static/media/homePicture4.c32218359e260347dc3e.jpg",
+    "static/media/homePicture1.jpg": "/static/media/homePicture1.f7acd5bfe4c1342780a5.jpg",
+    "static/media/liftMap.png": "/static/media/liftMap.099a136691115b436f1c.png",
     "index.html": "/index.html",
-    "main.ff02f4b5.css.map": "/static/css/main.ff02f4b5.css.map",
-    "main.c5c367c5.js.map": "/static/js/main.c5c367c5.js.map",
-    "453.7a8c23ee.chunk.js.map": "/static/js/453.7a8c23ee.chunk.js.map"
+    "main.a937a2b9.css.map": "/static/css/main.a937a2b9.css.map",
+    "main.c1f641fa.js.map": "/static/js/main.c1f641fa.js.map"
   },
   "entrypoints": [
-    "static/css/main.ff02f4b5.css",
-    "static/js/main.c5c367c5.js"
+    "static/css/main.a937a2b9.css",
+    "static/js/main.c1f641fa.js"
   ]
 }
