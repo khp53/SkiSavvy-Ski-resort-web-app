@@ -146,7 +146,9 @@ const Graph = () => {
                             : 'blue' : 'grey'
                 }
                 strokeWidth="4"
-              />
+              >
+                <title>{`${edge.type}\nDifficulty: ${edge.difficulty}`}</title>
+              </line>
             );
           })}
           {data.data.nodes.map((node, index) => (
@@ -157,7 +159,10 @@ const Graph = () => {
               r="20"
               fill={selectedNodes.start === node.id || selectedNodes.end === node.id ? 'red' : 'black'}
               onClick={() => handleNodeClick(node.id)}
-            />
+            >
+              <title>{`${node.name}`}</title>
+            </circle>
+
           ))}
         </svg>
         {selectedNodes.end && showDifficultyModal && (
