@@ -4,7 +4,7 @@ import SkiLayout from "@/pages/SkiLayout";
 import About from '@/pages/About'
 import Contact from "@/pages/Contact";
 import Map from "@/pages/Map";
-import map from '@/assets/mountain.jpg'
+
 import '../pages/Map/map.css';
 
 const route = createBrowserRouter([
@@ -26,12 +26,7 @@ const route = createBrowserRouter([
             },
             {
                 path: '/map',
-                element: <div className="graph-container">
-                    <img src={map} alt="Background Image" className="background-image" />
-                    <div id="graph" className="graph">
-                        <Map />
-                    </div>
-                </div>
+                element: <Map />
             }
         ]
     }
