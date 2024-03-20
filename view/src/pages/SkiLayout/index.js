@@ -32,7 +32,7 @@ export default function SkiLayout() {
             icon: <TeamOutlined style={{ color: 'black' }} />,
         },
         {
-            label: 'Piste Map',
+            label: 'Calculate Route',
             key: '/map',
             icon: <CompassOutlined style={{ color: 'black' }} />
         }

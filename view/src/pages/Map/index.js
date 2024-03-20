@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import map from '@/assets/mountain.jpg'
 
-const Graph = () => {
+const Map = () => {
   const [data, setData] = useState({ data: { nodes: [], edges: [] } });
   const [selectedNodes, setSelectedNodes] = useState({ start: null, end: null });
   const [highlightedPaths, setHighlightedPaths] = useState([]);
@@ -13,7 +13,7 @@ const Graph = () => {
   const [selectedRouteOption, setSelectedRouteOption] = useState('all');
   const [alertShown, setAlertShown] = useState(false);
 
-
+  // fetch map data from api
   useEffect(() => {
     fetch('http://localhost:4000/api/resort')
       .then((response) => {
@@ -34,18 +34,25 @@ const Graph = () => {
       });
   }, []);
 
+  // when a start or end node is selected this function will be called
   const handleNodeClick = (nodeId) => {
     if (!selectedNodes.start) {
+      // set the start node
       setSelectedNodes({ ...selectedNodes, start: nodeId });
+      // after setting the start node, prompt the user to choose the end node
       alert('Please choose your destination on the map!');
     } else if (!selectedNodes.end) {
+      // set the end node
       setSelectedNodes({ ...selectedNodes, end: nodeId });
+      // after setting the end node, prompt the user to choose the difficulty level
       alert('Please choose your difficulty level.');
     }
   };
 
   useEffect(() => {
     if (selectedNodes.start && selectedNodes.end) {
+      // find all possible paths between the start and end nodes
+      // the graph is considered a DAG (Directed Acyclic Graph)
       const paths = findAllPaths(data.data, selectedNodes.start, selectedNodes.end);
       if (!showDifficultyModal) {
         setHighlightedPaths(paths);
@@ -95,7 +102,7 @@ const Graph = () => {
 
   const handleDifficultySelect = (difficulty) => {
     setSelectedDifficulty(difficulty);
-    setShowDifficultyModal(false); // Close the difficulty modal after selecting a difficulty
+    setShowDifficultyModal(false);
   };
 
   const restartPathFinding = () => {
@@ -114,14 +121,14 @@ const Graph = () => {
           {data.data.edges.map((edge, index) => {
             const sourceNode = data.data.nodes.find((node) => node.id === edge.source);
             const targetNode = data.data.nodes.find((node) => node.id === edge.target);
-
+            // This offset calculation allows multiple edges between the same nodes to not overlap
             // Calculate the angle between the source and target nodes
             const dx = targetNode.x - sourceNode.x;
             const dy = targetNode.y - sourceNode.y;
             const angle = Math.atan2(dy, dx);
 
             // Calculate the offset for the edge
-            const offset = 2; // Adjust this value as needed
+            const offset = 2;
             const x1 = sourceNode.x + Math.cos(angle) * offset;
             const y1 = sourceNode.y + Math.sin(angle) * offset;
             const x2 = targetNode.x - Math.cos(angle) * offset;
@@ -134,6 +141,7 @@ const Graph = () => {
                 x2={x2}
                 y2={y2}
                 stroke={
+                  // show the edge in different colors based on the difficulty level
                   isEdgeHighlighted(edge) ?
                     edge.difficulty === 'none' ?
                       'green' :
@@ -206,4 +214,4 @@ const Graph = () => {
   );
 };
 
-export default Graph;
+export default Map;
