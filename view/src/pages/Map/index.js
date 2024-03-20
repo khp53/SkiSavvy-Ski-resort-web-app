@@ -7,7 +7,7 @@ const Graph = () => {
   const [highlightedPaths, setHighlightedPaths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showDifficultyModal, setShowDifficultyModal] = useState(false); // State to control difficulty modal visibility
+  const [showDifficultyModal, setShowDifficultyModal] = useState(true); // State to control difficulty modal visibility
   const [selectedDifficulty, setSelectedDifficulty] = useState(null); // State to store selected difficulty
   const [routeCalculated, setRouteCalculated] = useState(false);
   const [selectedRouteOption, setSelectedRouteOption] = useState('all');
@@ -70,13 +70,17 @@ const Graph = () => {
   useEffect(() => {
     if (selectedNodes.start && selectedNodes.end) {
       const paths = findAllPaths(data.data, selectedNodes.start, selectedNodes.end);
-      setHighlightedPaths(selectedRouteOption === 'all' ? paths : [paths[0]]);
-      setRouteCalculated(true);
-      alert('Calculated routes! You can also choose your desired route options from dropdown.');
+      if (!showDifficultyModal) {
+        setTimeout(() => {
+          setHighlightedPaths(selectedRouteOption === 'all' ? paths : [paths[0]]);
+          setRouteCalculated(true);
+          alert('Calculated routes! You can also choose your desired route options from dropdown.');
+        }, 1000); // 1000 milliseconds delay
+      }
     } else {
       setHighlightedPaths([]);
     }
-  }, [selectedNodes, data, selectedRouteOption]);
+  }, [selectedNodes, data, selectedRouteOption, showDifficultyModal]);
 
   const findAllPaths = (graph, start, end) => {
     const paths = [];
@@ -172,8 +176,8 @@ const Graph = () => {
       </svg>
       {selectedNodes.end && showDifficultyModal && (
         <div>
-          <p>Choose a route option:</p>
-          <select>
+          <h3>Choose a difficulty level:</h3>
+          <select onChange={(val) => handleDifficultySelect(val.target.value)}>
             <option value="Begginer">Begginer</option>
             <option value="Intermediate">Intermediate</option>
             <option value="Expert">Expert</option>
@@ -181,9 +185,9 @@ const Graph = () => {
           </select>
         </div>
       )}
-      {routeCalculated && (
+      {routeCalculated && !showDifficultyModal && (
         <div>
-          <p>Choose a route option:</p>
+          <h3>Choose a route option:</h3>
           <select onChange={(val) => setSelectedRouteOption(val.target.value)}>
             <option value="all">All Routes</option>
             <option value="scenic">Scenic Routes</option>
