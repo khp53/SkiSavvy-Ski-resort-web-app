@@ -1,8 +1,8 @@
-class PathModel {
+class Route {
     constructor(startPoint, endPoint) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
     }
 }
 
-module.exports = PathModel;
+module.exports = Route;

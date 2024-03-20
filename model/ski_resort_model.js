@@ -1,4 +1,4 @@
-class SkiResortModel {
+class SkiResort {
     constructor(_id, nodes, edges) {
         this._id = _id;
         this.nodes = nodes.map(node => new Node(nodes.id, nodes.name));
