@@ -1,4 +1,4 @@
-import React from 'react'
+import React , { useState }from 'react'
 import {
     HomeOutlined,
     DiffOutlined,
@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd';
 import '@/pages/SkiLayout/index.scss'
-import { Outlet,useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 
 export default function SkiLayout() {
@@ -18,22 +18,22 @@ export default function SkiLayout() {
         {
             label: 'Home',
             key: '/',
-            icon: <HomeOutlined style={{color:'black'}}/>,
+            icon: <HomeOutlined style={{ color: 'black' }} />,
         },
         {
             label: 'About',
             key: '/about',
-            icon: <DiffOutlined style={{color:'black'}}/>,
+            icon: <DiffOutlined style={{ color: 'black' }} />,
         },
         {
             label: 'Contact us',
             key: '/contact',
-            icon: <TeamOutlined style={{color:'black'}}/>,
+            icon: <TeamOutlined style={{ color: 'black' }} />,
         },
         {
             label: 'Piste Map',
             key: '/map',
-            icon: <CompassOutlined style={{color:'black'}}/>
+            icon: <CompassOutlined style={{ color: 'black' }} />
         }
     ]
 

@@ -3,23 +3,66 @@
     padding-left: 20px;
 }
 
-.lift-map-title {
-    font-size: 30px;
-    font-weight: bold;
-    text-align: center;
-    width: 100%;
-    margin-top: 20px;
+//phone style
+@media(max-width: 900px) {
+    .lift-map-title {
+        font-size: 4vw;
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .card-image-style {
+        object-fit:cover;
+        width:100%;
+        height:35vw;
+    }
+    .card-style {
+        width: 100%;
+        //height: 100%;
+        padding-top: 10px;
+        padding-right: 10px;
+        padding-bottom: 0.5rem;
+        padding-left: 10px;
+        margin-bottom: 1rem;
+    }
+    .card-description{
+        font-size:12px;
+        font-weight:600;
+    }
 }
 
-.card-style {
-    width: 480px;
-    padding-top: 20px;
-    padding-right: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
+//laptop style
+@media(min-width: 900px) {
+    .lift-map-title {
+        font-size: 2vw;
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .card-image-style {
+        object-fit:cover;
+        width:100%;
+        height:25vw;
+    }
+    .card-style {
+        width: 100%;
+        //height: 100%;
+        padding-top: 20px;
+        padding-right: 20px;
+        padding-bottom: 2rem;
+        padding-left: 20px;
+        margin-bottom: 2rem;
+    }
+    .card-description{
+        font-size:16px;
+        font-weight:600;
+    }
 }
 
-.card-image-style {
-    height: 580px;
-    width: 440px;
+
+
+.ant-card-body {
+    padding: 0 !important;
 }

@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-app.get('/', async (req, res) => {
+app.get('/*', async (req, res) => {
 	res.sendFile(path.join(__dirname, 'view/build', 'index.html'));
 });
 
