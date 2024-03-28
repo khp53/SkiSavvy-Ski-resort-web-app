@@ -7,6 +7,9 @@ view/node_modules
 /view/node_modules
 /.pnp
 .pnp.js
+/build
+/view/build
+build
 
 # testing
 /coverage
