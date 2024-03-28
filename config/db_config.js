@@ -1,26 +1,33 @@
-const { MongoClient } = require('mongodb');
-let _db;
+// db_config.js
 
-async function connectDB() {
-    const uri = "mongodb+srv://mkarimulh:H3eAOOhImlbKtRWL@cluster0.o4wrshh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-    // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-    const client = new MongoClient(uri);
+const mongoose = require('mongoose');
 
-    try {
-        await client.connect();
-        _db = await client.db("SkiSavvy")
-        _db.command({ serverStatus: {} }, function (err, data) {
-            if (err) {
-                console.log("Database is not connected");
-            } else {
-                console.log("Database is connected");
-            }
-        });
-        return _db;
-    } catch (e) {
-        console.error(e);
-    }
-}
+// Retrieve MongoDB connection string from environment variables
+const mongoURI = process.env.MONGODB_URI;
 
-connectDB().catch(console.error);
-module.exports = connectDB;
+// Connect to MongoDB
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Error connecting to MongoDB:', err));
+
+// Event handlers for MongoDB connection
+mongoose.connection.on('connected', () => {
+    console.log('MongoDB connected');
+});
+
+mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+    console.log('MongoDB disconnected');
+});
+
+process.on('SIGINT', () => {
+    mongoose.connection.close(() => {
+        console.log('MongoDB disconnected due to application termination');
+        process.exit(0);
+    });
+});
+
+module.exports = mongoose;
