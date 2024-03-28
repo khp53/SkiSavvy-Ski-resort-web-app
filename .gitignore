@@ -2,9 +2,11 @@
 
 # dependencies
 /node_modules
+node_modules
+view/node_modules
+/view/node_modules
 /.pnp
 .pnp.js
-/view/node_modules
 
 # testing
 /coverage
@@ -24,3 +26,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# eslint cache
+.eslintcache
