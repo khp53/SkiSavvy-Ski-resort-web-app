@@ -1,22 +1,51 @@
+const mongoose = require('mongoose');
+
 class SkiResort {
-    constructor(_id, nodes, edges) {
-        this._id = _id;
-        this.nodes = nodes.map(node => new Node(nodes.id, nodes.name));
-        this.edges = edges.map(edge => new Edge(edges.source, edges.target));
+
+    constructor() {
+        this.initializeSchemas();
+        this.initializeModel();
+    }
+
+    initializeNodeSchema() {
+        this.nodeSchema = new mongoose.Schema({
+            id: { type: Number, required: true },
+            name: { type: String, required: true },
+            x: { type: Number, required: true },
+            y: { type: Number, required: true }
+        });
+    }
+
+    initializeEdgeSchema() {
+        this.edgeSchema = new mongoose.Schema({
+            source: { type: Number, required: true },
+            target: { type: Number, required: true },
+            type: { type: String, required: true },
+            difficulty: { type: String, required: true }
+        });
+    }
+
+    initializeSkiResortSchema() {
+        this.skiResortSchema = new mongoose.Schema({
+            _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+            nodes: [this.nodeSchema],
+            edges: [this.edgeSchema]
+        });
+    }
+
+    initializeModel() {
+        this.SkiResort = mongoose.model('skiresorts', this.skiResortSchema);
+    }
+
+    initializeSchemas() {
+        this.initializeNodeSchema();
+        this.initializeEdgeSchema();
+        this.initializeSkiResortSchema();
+    }
+
+    getResortModel() {
+        return this.SkiResort;
     }
 }
 
-class Node {
-    constructor(id, name) {
-        this.id = id;
-        this.name = name;
-    }
-}
-
-class Edge {
-    constructor(source, target) {
-        this.source = source;
-        this.target = target;
-    }
-}
-
+module.exports = SkiResort;

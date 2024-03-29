@@ -21,7 +21,7 @@ class Route {
     }
 
     initializeModel() {
-        this.Path = mongoose.model('Paths', this.pathSchema);
+        this.Path = mongoose.model('paths', this.pathSchema);
     }
 
     getPathModel() {

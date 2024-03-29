@@ -7,6 +7,7 @@ class PathController {
         this.route = new Route();
         this.Path = this.route.getPathModel();
         this.createPath = this.createPath.bind(this);
+        this.getAllPaths = this.getAllPaths.bind(this);
     }
 
     async createPath(req, res) {
@@ -22,6 +23,16 @@ class PathController {
         try {
             await data.save();
             return res.status(201).json({ statusCode: 201, message: 'Path selected successfully', data: data });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+        }
+    }
+
+    async getAllPaths(req, res) {
+        try {
+            const paths = await this.Path.find();
+            return res.status(200).json({ statusCode: 200, message: 'Paths retrieved successfully', data: paths });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
