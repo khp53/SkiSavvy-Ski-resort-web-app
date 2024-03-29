@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, ImageOverlay, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import PriorityQueue from './PriorityQueue';
 
-const MapWithGraph = ({ imageUrl, graphData }) => {
+const MapWithGraph = ({ imageUrl }) => {
     const [startNodeId, setStartNodeId] = useState(null);
     const [endNodeId, setEndNodeId] = useState(null);
     const [shortestPath, setShortestPath] = useState([]);
     const map = useMap();
+
+    const graphData = {
+        nodes: [
+            { id: 1, latLng: [35, 300] },
+            { id: 2, latLng: [70, 400] },
+            { id: 3, latLng: [75, 380] },
+            { id: 4, latLng: [20, 350] },
+            { id: 5, latLng: [45, 480] }
+        ],
+        edges: [
+            { id: 1, latLngs: [[35, 300], [70, 400]], weight: 5 },
+            { id: 2, latLngs: [[35, 300], [75, 380]], weight: 10 },
+            { id: 3, latLngs: [[70, 400], [20, 350]], },
+            { id: 4, latLngs: [[75, 380], [45, 480]] },
+            { id: 5, latLngs: [[20, 350], [45, 480]] }
+        ]
+    };
 
     useEffect(() => {
         graphData.nodes.forEach(node => {
