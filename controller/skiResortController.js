@@ -1,4 +1,4 @@
-const Resort = require('../model/ski_resort_model');
+const Resort = require('../model/skiResortModel');
 
 class SkiResortController {
     constructor() {

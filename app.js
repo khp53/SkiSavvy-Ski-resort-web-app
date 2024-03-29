@@ -1,9 +1,9 @@
 // Load environment variables
 require('dotenv').config();
-const mongoose = require('./config/db_config');
+const mongoose = require('./config/dbConfig');
 const express = require('express');
 const path = require('path');
-const routes = require('./routes/data_routes');
+const routes = require('./routes/dataRoutes');
 const app = express();
 const port = 4000;
 

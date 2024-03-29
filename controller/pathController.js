@@ -1,6 +1,6 @@
 // pathController.js
 
-const Route = require('../model/route_model');
+const Route = require('../model/routeModel');
 
 class PathController {
     constructor() {
