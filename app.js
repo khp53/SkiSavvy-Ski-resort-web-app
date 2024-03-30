@@ -1,6 +1,9 @@
+// Load environment variables
+require('dotenv').config();
+const mongoose = require('./config/dbConfig');
 const express = require('express');
 const path = require('path');
-const routes = require('./routes/data_routes');
+const routes = require('./routes/dataRoutes');
 const app = express();
 const port = 4000;
 
@@ -17,7 +20,7 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-app.get('/*', async (req, res) => {
+app.get('/', async (req, res) => {
 	res.sendFile(path.join(__dirname, 'view/build', 'index.html'));
 });
 
