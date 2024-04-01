@@ -61,6 +61,16 @@ class CalculateRouteController {
             return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
         }
     }
+
+    async getFirstRoute(req, res) {
+        try {
+            const route = await this.Route.findOne();
+            return res.status(200).json({ statusCode: 200, message: 'Route retrieved successfully', data: route });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+        }
+    }
 }
 
 module.exports = CalculateRouteController;

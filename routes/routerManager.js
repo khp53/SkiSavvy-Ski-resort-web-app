@@ -12,9 +12,10 @@ class RouterManager {
         const crController = new CalculateRouteController();
         const resortController = new SkiResortController();
 
-        this.router.post('/route', crController.insertRoute.bind(crController));
         this.router.get('/resort', resortController.getTheFirstSkiResort.bind(resortController));
+        this.router.post('/route', crController.insertRoute.bind(crController));
         this.router.get('/route/all', crController.getAllRoutes.bind(crController));
+        this.router.get('/route/find/new', crController.getFirstRoute.bind(crController));
     }
 
     getRouter() {
