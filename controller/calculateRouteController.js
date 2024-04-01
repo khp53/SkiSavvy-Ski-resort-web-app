@@ -1,6 +1,7 @@
 // pathController.js
 
 const Route = require('../model/routeModel');
+const SkiResortController = require('../controller/skiResortController');
 
 class CalculateRouteController {
     constructor() {
@@ -70,6 +71,31 @@ class CalculateRouteController {
             console.error(error);
             return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
         }
+    }
+
+    // get the first ski resort by using skiResortController getTheFirstSkiResort method
+    // and using the getFirstRoute method to get the first route
+    // calculate all possible paths between the first ski resort and the first route
+    // and return all possible paths
+    async calculateAllPaths(req, res) {
+        try {
+            const skiResortController = req.resortController;
+            const firstSkiResort = await skiResortController.getTheFirstSkiResort.bind(skiResortController);
+            const route = await this.Route.findOne();
+            const paths = await this.calculatePaths(firstSkiResort, route);
+            return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: paths });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+        }
+    }
+
+    // calculate all possible paths between the first ski resort and the first route
+    async calculatePaths(skiResort, route) {
+        const paths = [];
+        // calculate all possible paths
+        // between the first ski resort and the first route
+        return paths;
     }
 }
 

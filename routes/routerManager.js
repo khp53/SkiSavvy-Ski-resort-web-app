@@ -16,6 +16,10 @@ class RouterManager {
         this.router.post('/route', crController.insertRoute.bind(crController));
         this.router.get('/route/all', crController.getAllRoutes.bind(crController));
         this.router.get('/route/find/new', crController.getFirstRoute.bind(crController));
+        this.router.get('/route/calculate/all', (req, res, next) => {
+            req.resortController = resortController;
+            next();
+        }, crController.calculateAllPaths.bind(crController));
     }
 
     getRouter() {
