@@ -9,24 +9,51 @@ class Route {
 
     initializeSchema() {
         this.pathSchema = new mongoose.Schema({
-            startPoint: {
-                type: String,
-                required: true
+            start: {
+                id: {
+                    type: Number,
+                    required: true
+                },
+                title: {
+                    type: String,
+                    required: true
+                },
+                latLng: [{
+                    type: Number,
+                    required: true
+                }]
             },
-            endPoint: {
-                type: String,
-                required: true
+            end: {
+                id: {
+                    type: Number,
+                    required: true
+                },
+                title: {
+                    type: String,
+                    required: true
+                },
+                latLng: [{
+                    type: Number,
+                    required: true
+                }]
+            },
+            profile: {
+                difficulty: {
+                    type: String,
+                    required: true
+                }
             }
         });
     }
 
     initializeModel() {
-        this.Path = mongoose.model('paths', this.pathSchema);
+        this.Route = mongoose.model('routes', this.pathSchema);
     }
 
-    getPathModel() {
-        return this.Path;
+    getRouteModel() {
+        return this.Route;
     }
 }
 
 module.exports = Route;
+

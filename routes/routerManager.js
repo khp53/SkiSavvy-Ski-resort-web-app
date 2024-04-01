@@ -1,5 +1,5 @@
 const express = require('express');
-const PathController = require('../controller/pathController');
+const CalculateRouteController = require('../controller/calculateRouteController');
 const SkiResortController = require('../controller/skiResortController');
 
 class RouterManager {
@@ -9,12 +9,12 @@ class RouterManager {
     }
 
     initializeRoutes() {
-        const pathController = new PathController();
+        const crController = new CalculateRouteController();
         const resortController = new SkiResortController();
 
-        this.router.post('/path', pathController.createPath.bind(pathController));
+        this.router.post('/route', crController.insertRoute.bind(crController));
         this.router.get('/resort', resortController.getTheFirstSkiResort.bind(resortController));
-        this.router.get('/path/all', pathController.getAllPaths.bind(pathController));
+        this.router.get('/route/all', crController.getAllRoutes.bind(crController));
     }
 
     getRouter() {
