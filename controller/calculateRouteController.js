@@ -1,9 +1,5 @@
-const RouteSelection = require('../model/routeSelectionModel');
-
 class CRController {
     constructor() {
-        this.routeSelection = new RouteSelection();
-        this.SelectedRoute = this.routeSelection.getRouteSelectionModel();
     }
 
     // get the first ski resort by using skiResortController getTheFirstSkiResort method
@@ -14,8 +10,9 @@ class CRController {
         try {
             const skiResortController = req.resortController;
             const firstSkiResort = await skiResortController.getTheFirstSkiResort.bind(skiResortController);
-            const selectedRoute = await this.SelectedRoute.findOne();
-            const routes = await this.calculatePaths(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
+            const routeSelectionController = req.routeSelectionController;
+            const selectedRoute = await routeSelectionController.getFirstSelection.bind(routeSelectionController);
+            const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);

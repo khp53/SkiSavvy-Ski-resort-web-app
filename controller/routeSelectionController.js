@@ -60,7 +60,7 @@ class RouteSelectionController {
 
     async getFirstSelection(req, res) {
         try {
-            const selection = await this.SelectedRoute.findOne();
+            const selection = await this.SelectedRoute.findOne(); // if last one change this
             return res.status(200).json({ statusCode: 200, message: 'Points retrieved successfully', data: selection });
         } catch (error) {
             console.error(error);
