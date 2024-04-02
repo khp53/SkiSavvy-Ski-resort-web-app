@@ -39,6 +39,7 @@ export default function Home() {
         speed={2000}
         autoplaySpeed={5000}
         waitForAnimate={true}
+        style={{ marginBottom: '5vw' }}
       >
         <HomeSlide picture={picture1} />
         <HomeSlide picture={picture2} />
@@ -48,41 +49,74 @@ export default function Home() {
 
       <h3 className='lift-map-title'>Lift Map</h3>
 
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <img src={liftMap} alt='liftMap' height='500px' width='1300px' style={{ paddingBottom: '20px', position: 'center' }}></img>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '5vw' }}>
+        <img src={liftMap} alt='liftMap' width='80%' style={{ paddingBottom: '20px', position: 'center' }}></img>
       </div>
 
       <h3 className='lift-map-title'>Other Functions</h3>
 
-      <Row gutter={16} justify="space-evenly">
-        <Col span={6}>
+      <Row gutter={16} justify="space-evenly" className='three-card'>
+        <Col xs={10} sm={10} md={5} lg={5}>
           <Card
             hoverable
             className='card-style'
-            cover={<img alt="find restaurant" src={findRestaurant} className='card-image-style' />}
+            style={{
+              width: '100%',
+            }}
           >
-            <Meta title="Find Restaurant" />
+            <div style={{width:'100%', marginBottom:'2vw'}}>
+              <img src={findRestaurant}  className='card-image-style'/>
+            </div>
+            <div className='card-description'>Find Restaurant</div>
+          </Card>
 
+        </Col>
+
+        <Col xs={10} sm={10} md={5} lg={5}>
+        <Card
+            hoverable
+            className='card-style'
+            style={{
+              width: '100%',
+            }}
+          >
+            <div style={{width:'100%', marginBottom:'2vw'}}>
+              <img src={calculateRoute} className='card-image-style'/>
+            </div>
+            <div className='card-description'>Calculate Route</div>
           </Card>
         </Col>
-        <Col span={6}>
+
+        <Col xs={10} sm={10} md={5} lg={5}>
+        <Card
+            hoverable
+            className='card-style'
+            style={{
+              width: '100%',
+            }}
+          >
+            <div style={{width:'100%', marginBottom:'2vw'}}>
+              <img src={useLift} className='card-image-style'/>
+            </div>
+            <div className='card-description'>Use Lift</div>
+          </Card>
+        </Col>
+        
+        <Col xs={10} sm={10} md={5} lg={5}>
           <Card
             hoverable
             className='card-style'
-            cover={<img alt="calculate route" src={calculateRoute} className='card-image-style' />}
+            style={{
+              width: '100%',
+            }}
           >
-            <Meta title="Calculate Route" />
+            <div style={{width:'100%', marginBottom:'2vw'}}>
+              <img src={findRestaurant} className='card-image-style'/>
+            </div>
+            <div className='card-description'>Europe Street beat</div>
           </Card>
         </Col>
-        <Col span={6}>
-          <Card
-            hoverable
-            className='card-style'
-            cover={<img alt="use lift" src={useLift} className='card-image-style' />}
-          >
-            <Meta title="Use Lift" />
-          </Card>
-        </Col>
+
       </Row>
 
       {/* back to top */}
