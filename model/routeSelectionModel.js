@@ -1,14 +1,13 @@
-// ../model/Route.js
 const mongoose = require('mongoose');
 
-class Route {
+class RouteSelection {
     constructor() {
         this.initializeSchema();
         this.initializeModel();
     }
 
     initializeSchema() {
-        this.pathSchema = new mongoose.Schema({
+        this.selectionSchema = new mongoose.Schema({
             start: {
                 id: {
                     type: Number,
@@ -47,13 +46,13 @@ class Route {
     }
 
     initializeModel() {
-        this.Route = mongoose.model('routes', this.pathSchema);
+        this.RouteSelection = mongoose.model('selections', this.selectionSchema);
     }
 
-    getRouteModel() {
-        return this.Route;
+    getRouteSelectionModel() {
+        return this.RouteSelection;
     }
 }
 
-module.exports = Route;
+module.exports = RouteSelection;
 
