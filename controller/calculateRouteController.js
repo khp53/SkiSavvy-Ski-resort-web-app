@@ -24,6 +24,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
                 const distance = await this.calculateDistance(node.latLng[0], node.latLng[1], otherNode.latLng[0], otherNode.latLng[1]);
                 console.log(distance);
                 if (distance > 1) { // threshold to be adjusted per our implementation
+                                    // we can limit the graph traversal to only neighors within a region
                     neighbors.push(otherNode.id);
                 }
             }
@@ -154,9 +155,9 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         skiResort = {
             "nodes": [
                 { "id": 1, "title": "A", "latLng": [12, 270] },
-                //{ "id": 2, "title": "B", "latLng": [20, 300] },
+                { "id": 2, "title": "B", "latLng": [20, 300] },
                 { "id": 6, "title": "F", "latLng": [65, 292] },
-                //{ "id": 7, "title": "G", "latLng": [62, 314] },
+                { "id": 7, "title": "G", "latLng": [62, 314] },
                 { "id": 8, "title": "H", "latLng": [74, 293] }
             ],
             "edges": [
@@ -248,9 +249,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
               },
             ]
         };
-
-
-
+        
         start = 1; // ID of start node
         end = 8; // ID of end node
         profile = "medium";
