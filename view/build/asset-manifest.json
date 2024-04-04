@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.56405bcb.css",
+    "main.js": "/static/js/main.6c91b284.js",
+    "static/media/findRestaurant.jpg": "/static/media/findRestaurant.2a57691b2691a48b648b.jpg",
+    "static/media/homePicture3.jpg": "/static/media/homePicture3.1aa9dd889a6977d71659.jpg",
+    "static/media/useLift.jpg": "/static/media/useLift.898dc4c03ee2f38cd46b.jpg",
+    "static/media/resortBackground.jpg": "/static/media/resortBackground.386952f11dafd14fb606.jpg",
+    "static/media/calculateRoute.jpg": "/static/media/calculateRoute.62e068c6a8a758defddc.jpg",
+    "static/media/homePicture2.jpg": "/static/media/homePicture2.48ed93986faaf1a8db03.jpg",
+    "static/media/homePicture4.jpg": "/static/media/homePicture4.c32218359e260347dc3e.jpg",
+    "static/media/homePicture1.jpg": "/static/media/homePicture1.f7acd5bfe4c1342780a5.jpg",
+    "static/media/liftMap.png": "/static/media/liftMap.099a136691115b436f1c.png",
+    "static/media/map_bg.svg": "/static/media/map_bg.96d90e30b240a72cb7e75caa31690fda.svg",
+    "index.html": "/index.html",
+    "main.56405bcb.css.map": "/static/css/main.56405bcb.css.map",
+    "main.6c91b284.js.map": "/static/js/main.6c91b284.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.56405bcb.css",
+    "static/js/main.6c91b284.js"
+  ]
+}

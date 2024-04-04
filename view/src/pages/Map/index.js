@@ -1,52 +1,45 @@
-import { Col, Row } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Col, Row, Checkbox, Tour, message } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer } from 'react-leaflet';
 import MapWithGraph from './components/MapWithGraph';
-import ChooseSlopeDifficulty from '@/pages/Map/components/ChooseSlopeDifficulty'
-import { Select, Button, Modal } from 'antd';
+import { Select, Button } from 'antd';
+import { current } from '@reduxjs/toolkit';
 
 
 const Map = () => {
 
     //need use API send to the backend
-    const [customerDifficulty, setCustomerDifficulty] = useState([])
+     const [difficulty, setDifficulty] = useState([]);
 
-    const [showChoose, setShowChoose] = useState(false)
+    //need use filter search the same strategy from the back data
+    const [strategyChoice, setStrategyChoice] = useState(null)
 
-    //need use API send to the backend
-    const [strategyChoice, setStrategyChoice] = useState()
+    //startNodeId in the Map component
+    const [startNodeId, setStartNodeId] = useState(null);
 
-    const [isStartPointModalOpen, setIsStartPointModalOpen] = useState(false);
+    //endNodeId in the Map component
+    const [endNodeId, setEndNodeId] = useState(null);
 
-    const [isEndPointModalOpen, setIsEndPointModalOpen] = useState(false)
+    const [open, setOpen] = useState(false);
 
-    const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false)
+    //control 3 step
+    const [step, setStep] = useState(1);
+
+    //alert no startpoint or endpoint
+    const [messageApi, contextHolder] = message.useMessage()
 
 
-    const chooseDifficulty = (data) => {
-        setCustomerDifficulty(data)
-    }
-
-    const isDifficultyFinish = (data) => {
-        setIsStartPointModalOpen(data)
-    }
-
-    const isSelectStartPointFinish = (data) => [
-        setIsEndPointModalOpen(data)
+    //get the customer start point from the son component (MapWithGraph)
+    const getStartNodeId = (data) => [
+        setStartNodeId(data)
     ]
 
-    const isSelectEndPointFinish = (data) => [
-        setIsStrategyModalOpen(data)
+    //get the customer end point from the son component (MapWithGraph)
+    const getEndNodeId = (data) => [
+        setEndNodeId(data)
     ]
 
-    useEffect(() => {
-        if (customerDifficulty.length > 0) {
-            setShowChoose(true)
-        }
-    }, [customerDifficulty])
-
-
-
+    //4 strategy in the pull down
     const option = [
         {
             value: 'shortest',
@@ -66,75 +59,209 @@ const Map = () => {
         },
     ]
 
+    //get customer prefer strategy
     const handleChange = (value) => {
         console.log(`selected ${value}`);
         setStrategyChoice(value)
     };
 
+    //verify is valid (already select start and end point or not, is valid then to the step2)
     const handleClick = () => {
-        //using API put the strategyChoice to the backend
+        if (startNodeId === null || endNodeId === null) {
+            messageApi.open({
+                type: 'warning',
+                content: 'Please select the start point or the end point!',
+                
+            });
+            return
+        }
 
+        //using API put the strategyChoice to the backend(or use filter from the back data)
+
+
+        setStep(2)
     }
 
-    const handleStartPointOk = () => {
-        setIsStartPointModalOpen(false)
+
+    //verify already select one strategy or not, if vaild then to the step3 description the route
+    const handleClick2 = () => {
+        if (strategyChoice === null) {
+            messageApi.open({
+                type: 'warning',
+                content: 'Please select one strategy you prefer!',
+            });
+            return
+        }
+        setStep(3)
     }
 
-    const handleEndPointOk = () => {
-        setIsEndPointModalOpen(false)
+    
+    const handleClick3 = () => {
+        setStep(1)
+        //setStrategyChoice(null)
     }
 
-    const handleStrategyOk = () => {
-        setIsStrategyModalOpen(false)
+    const handleClick4 = () => {
+        setStep(2)
     }
 
+    //reset buttom, clear all include the son component's(MapWithGraph) start and end point
+    const handleClick5 = () => {
+        setStep(1)
+        setStartNodeId(null)
+        setEndNodeId(null)
+        resetStartPoint()
+        resetEndPoint()
+        setDifficulty([])
+        setStrategyChoice(null)
+    }
+
+    //get the difficulty
+    const handleDifficutyChange = e => {
+        setDifficulty(e);
+        console.log(e)
+    };
+
+    const childRef = useRef();
+
+    //use this function can clear the start point both the Map and MapWithGraph
+    const resetStartPoint = () => {
+        childRef.current.resetStart();
+        setStartNodeId(null)
+    }
+
+    //use this function can clear the end point both the Map and MapWithGraph
+    const resetEndPoint = () => {
+        childRef.current.resetEnd();
+        setEndNodeId(null)
+    }
+
+    //description about the Tour box
+    const steps = [
+        {
+            title: 'Select the Start Point and reset buttom',
+            description: 'You can select the start point in the map by click the node.  Also you can reset your start point.',
+            //placement: 'center',
+            target: () => ref1.current,
+        },
+        {
+            title: 'Select the End Point and reset buttom',
+            description: 'You can select the end point in the map by click the node.  Also you can reset your end point.',
+            //placement: 'center',
+            target: () => ref2.current,
+        },
+        {
+            title: 'Select the difficultly your prefer, and click buttom for calculating',
+            description: 'You can choose easy(blue line) medium(red line) and hard(black line). It is multiple choice, then click the calculate route buttom will show you all the possible routes.',
+            //placement: 'center',
+            target: () => ref3.current,
+        },
+        // {
+        //     title: 'Select the strategy you prefer',
+        //     description: 'After calculate route, you can choose one strategy that you prefer, and it will show the differernt color route on the map.',
+        //     //placement: 'center',
+        //     target: () => ref4.current,
+        // },
+    ];
+
+    const ref1 = useRef(null);
+    const ref2 = useRef(null);
+    const ref3 = useRef(null);
+    //const ref4 = useRef(null);
+
+    // Open Tour box
+    useEffect(() => {
+        setOpen(true)
+    }, [])
 
     return (
         <div>
-            <ChooseSlopeDifficulty chooseDifficulty={chooseDifficulty} isDifficultyFinish={isDifficultyFinish} />
+            {/* <ChooseSlopeDifficulty chooseDifficulty={chooseDifficulty} isDifficultyFinish={isDifficultyFinish} /> */}
             <Row justify='space-around'>
                 <Col xs={22} sm={22} md={16} lg={16}>
-                    <MapContainer center={[66, 375]} zoom={2} style={{ height: '600px', width: '100%' }}>
-                        <MapWithGraph isSelectStartPointFinish={isSelectStartPointFinish} isSelectEndPointFinish={isSelectEndPointFinish} />
+                    <MapContainer center={[66, 375]} zoom={2} style={{ height: '60vw', width: '100%' }}>
+                        <MapWithGraph
+                            getStartNodeId={getStartNodeId}
+                            getEndNodeId={getEndNodeId}
+                            ref={childRef}
+                        />
                     </MapContainer>
                 </Col>
                 <Col xs={18} sm={18} md={6} lg={6}>
-                    {showChoose ?
-                        <h4 style={{ marginTop: '3vw', marginBottom: '4vw' }}>
-                            Your choose is :
-                            {customerDifficulty.map((item) => {
-                                return (<span style={{ color: `${item}` }}>{item}! </span>)
-                            })}
-                            slope!
-                        </h4>
-                        :
-                        ''}
-                    <h4>Choose a route option:</h4>
-                    <Select
-                        placeholder='Select your prefer'
-                        style={{
-                            width: '18vw',
-                            marginTop: '0.5vw',
-                            marginBottom: '1.5vw',
-                        }}
-                        onChange={handleChange}
-                        options={option}
-                    />
-                    <Button type="primary" style={{ width: '18vw' }} onClick={handleClick}>Calculate Route</Button>
+                    {
+                        step === 1 &&
+                        <div>
+                            <div style={{ marginTop: '4vw', marginBottom: '1vw' }}>
+                                <Checkbox checked={startNodeId !== null ? true : false} style={{ marginLeft: '4vw', marginRight: '4vw' }}>Start Point</Checkbox>
+                                <Checkbox checked={endNodeId !== null ? true : false} >End Point</Checkbox>
+                            </div>
+                            <div style={{ marginBottom: '4vw' }}>
+                                <Button ref={ref1} value="small" style={{ marginLeft: '5vw' }} onClick={resetStartPoint}>Reset</Button>
+                                <Button ref={ref2} value="small" style={{ marginLeft: '5vw' }} onClick={resetEndPoint}>Reset</Button>
+                            </div>
+                            <Checkbox.Group value={difficulty} onChange={handleDifficutyChange} style={{ marginLeft: '6vw', marginBottom: '1vw' }}>
+                                <Checkbox value="blue" style={{ color: 'blue' }}>Blue</Checkbox>
+                                <Checkbox value="red" style={{ color: 'red' }}>Red</Checkbox>
+                                <Checkbox value="black" style={{ color: 'black' }}>black</Checkbox>
+                            </Checkbox.Group>
+                            <br />
+                            {contextHolder}
+                            <Button ref={ref3} type="primary" style={{ width: '18vw', marginLeft: '3vw', marginBottom: '4vw' }} onClick={handleClick}>Calculate Route</Button>
+                        </div>
+                    }
+                    {
+                        step === 2 &&
+                        <div style={{marginTop:'5vw'}}>
+                            <h4 style={{ marginLeft: '3vw' }}>Choose a route option:</h4>
+                            <Select
+                                placeholder='Select your prefer'
+                                style={{
+                                    width: '18vw',
+                                    marginTop: '0.5vw',
+                                    marginBottom: '1.5vw',
+                                    marginLeft: '3vw',
+                                }}
+                                onChange={handleChange}
+                                options={option}
+                                defaultValue={strategyChoice}
+                            />
+                            <br />
+                            <div style={{width:'100%',display:'flex'}}>
+                                <Button style={{width:'9vw'}} onClick={handleClick3}>previous</Button>
+                                {contextHolder}
+                                <Button type="primary" style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} onClick={handleClick2}>Search</Button>
+                            </div>
+                            
+
+                        </div>
+                    }
+
+                    {
+                        step === 3 &&
+                        <div style={{marginTop:'5vw'}}>
+                            <p>
+                                result
+                            </p>
+                            <div style={{width:'100%',display:'flex'}}>
+                                <Button style={{width:'9vw'}} onClick={handleClick4}>previous</Button>
+                            <Button style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} type='primary' onClick={handleClick5}>reset</Button>
+                            </div>
+                            
+                        </div>
+                    }
+                    {/* Tour box */}
+                    <Tour open={open} onClose={() => setOpen(false)} steps={steps} scrollIntoViewOptions={true}
+                        indicatorsRender={(current, total) => (
+                            <span>
+                                {current + 1} / {total}
+                            </span>
+                        )} />
+
                 </Col>
 
             </Row>
-            <Modal title="Select Start Point" open={isStartPointModalOpen} onOk={handleStartPointOk} onCancel={handleStartPointOk} centered={true}>
-                <p>Select one point from the map!</p>
-            </Modal>
-            <Modal title="Select End Point" open={isEndPointModalOpen} onOk={handleEndPointOk} onCancel={handleEndPointOk} centered={true}>
-                <p>Select one point from the map!</p>
-            </Modal>
-            <Modal title="Choose a Route Option" open={isStrategyModalOpen} onOk={handleStrategyOk} onCancel={handleStrategyOk} centered={true}>
-                <p>Select one strategy from the drop-down box!</p>
-            </Modal>
-        </div>
 
+        </div>
 
 
     );
