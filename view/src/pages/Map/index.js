@@ -1,217 +1,143 @@
-import React, { useState, useEffect } from 'react';
-import map from '@/assets/mountain.jpg'
+import { Col, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { MapContainer } from 'react-leaflet';
+import MapWithGraph from './components/MapWithGraph';
+import ChooseSlopeDifficulty from '@/pages/Map/components/ChooseSlopeDifficulty'
+import { Select, Button, Modal } from 'antd';
+
 
 const Map = () => {
-  const [data, setData] = useState({ data: { nodes: [], edges: [] } });
-  const [selectedNodes, setSelectedNodes] = useState({ start: null, end: null });
-  const [highlightedPaths, setHighlightedPaths] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showDifficultyModal, setShowDifficultyModal] = useState(true); // State to control difficulty modal visibility
-  const [selectedDifficulty, setSelectedDifficulty] = useState(null); // State to store selected difficulty will be used in iteration 3
-  const [routeCalculated, setRouteCalculated] = useState(false);
-  const [selectedRouteOption, setSelectedRouteOption] = useState('all');
-  const [alertShown, setAlertShown] = useState(false);
 
-  // fetch map data from api
-  useEffect(() => {
-    fetch('http://localhost:4000/api/resort')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    //need use API send to the backend
+    const [customerDifficulty, setCustomerDifficulty] = useState([])
+
+    const [showChoose, setShowChoose] = useState(false)
+
+    //need use API send to the backend
+    const [strategyChoice, setStrategyChoice] = useState()
+
+    const [isStartPointModalOpen, setIsStartPointModalOpen] = useState(false);
+
+    const [isEndPointModalOpen, setIsEndPointModalOpen] = useState(false)
+
+    const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false)
+
+
+    const chooseDifficulty = (data) => {
+        setCustomerDifficulty(data)
+    }
+
+    const isDifficultyFinish = (data) => {
+        setIsStartPointModalOpen(data)
+    }
+
+    const isSelectStartPointFinish = (data) => [
+        setIsEndPointModalOpen(data)
+    ]
+
+    const isSelectEndPointFinish = (data) => [
+        setIsStrategyModalOpen(data)
+    ]
+
+    useEffect(() => {
+        if (customerDifficulty.length > 0) {
+            setShowChoose(true)
         }
-        alert('Welcome! Please choose a start location on the map!');
-        return response.json();
-      })
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-        setError(error);
-        setLoading(false);
-      });
-  }, []);
+    }, [customerDifficulty])
 
-  // when a start or end node is selected this function will be called
-  const handleNodeClick = (nodeId) => {
-    if (!selectedNodes.start) {
-      // set the start node
-      setSelectedNodes({ ...selectedNodes, start: nodeId });
-      // after setting the start node, prompt the user to choose the end node
-      alert('Please choose your destination on the map!');
-    } else if (!selectedNodes.end) {
-      // set the end node
-      setSelectedNodes({ ...selectedNodes, end: nodeId });
-      // after setting the end node, prompt the user to choose the difficulty level
-      alert('Please choose your difficulty level.');
-    }
-  };
 
-  useEffect(() => {
-    if (selectedNodes.start && selectedNodes.end) {
-      // find all possible paths between the start and end nodes
-      // the graph is considered a DAG (Directed Acyclic Graph)
-      const paths = findAllPaths(data.data, selectedNodes.start, selectedNodes.end);
-      if (!showDifficultyModal) {
-        setHighlightedPaths(paths);
-        setRouteCalculated(true);
-        alert('Calculated routes! You can also choose your desired route options from dropdown.');
-        setAlertShown(true);
-      }
-    } else {
-      setHighlightedPaths([]);
-      setAlertShown(false);
-    }
-  }, [selectedNodes, showDifficultyModal, selectedRouteOption, alertShown]);
 
-  const findAllPaths = (graph, start, end) => {
-    const paths = [];
-    const visited = {};
-    const stack = [[start]];
+    const option = [
+        {
+            value: 'shortest',
+            label: 'Shortest Route',
+        },
+        {
+            value: 'quickest',
+            label: 'Quickest Route',
+        },
+        {
+            value: 'easiest',
+            label: 'Easiest Route',
+        },
+        {
+            value: 'minimal',
+            label: 'Minimal Lift Usage',
+        },
+    ]
 
-    while (stack.length) {
-      const path = stack.pop();
-      const node = path[path.length - 1];
+    const handleChange = (value) => {
+        console.log(`selected ${value}`);
+        setStrategyChoice(value)
+    };
 
-      if (node === end) {
-        paths.push(path);
-      } else {
-        visited[node] = true;
-        const neighbors = graph.edges
-          .filter((edge) => edge.source === node || edge.target === node)
-          .map((edge) => (edge.source === node ? edge.target : edge.source))
-          .filter((neighbor) => !visited[neighbor]);
+    const handleClick = () => {
+        //using API put the strategyChoice to the backend
 
-        for (const neighbor of neighbors) {
-          stack.push([...path, neighbor]);
-        }
-      }
     }
 
-    return paths;
-  };
+    const handleStartPointOk = () => {
+        setIsStartPointModalOpen(false)
+    }
 
-  const isEdgeHighlighted = (edge) => {
-    return highlightedPaths.some((path) => path.includes(edge.source) && path.includes(edge.target));
-  };
+    const handleEndPointOk = () => {
+        setIsEndPointModalOpen(false)
+    }
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+    const handleStrategyOk = () => {
+        setIsStrategyModalOpen(false)
+    }
 
-  const handleDifficultySelect = (difficulty) => {
-    setSelectedDifficulty(difficulty);
-    setShowDifficultyModal(false);
-  };
 
-  const restartPathFinding = () => {
-    setSelectedNodes({ start: null, end: null });
-    setHighlightedPaths([]);
-    setShowDifficultyModal(true);
-    setRouteCalculated(false);
-    setSelectedRouteOption('all');
-  }
+    return (
+        <div>
+            <ChooseSlopeDifficulty chooseDifficulty={chooseDifficulty} isDifficultyFinish={isDifficultyFinish} />
+            <Row justify='space-around'>
+                <Col xs={22} sm={22} md={16} lg={16}>
+                    <MapContainer center={[66, 375]} zoom={2} style={{ height: '600px', width: '100%' }}>
+                        <MapWithGraph isSelectStartPointFinish={isSelectStartPointFinish} isSelectEndPointFinish={isSelectEndPointFinish} />
+                    </MapContainer>
+                </Col>
+                <Col xs={18} sm={18} md={6} lg={6}>
+                    {showChoose ?
+                        <h4 style={{ marginTop: '3vw', marginBottom: '4vw' }}>
+                            Your choose is :
+                            {customerDifficulty.map((item) => {
+                                return (<span style={{ color: `${item}` }}>{item}! </span>)
+                            })}
+                            slope!
+                        </h4>
+                        :
+                        ''}
+                    <h4>Choose a route option:</h4>
+                    <Select
+                        placeholder='Select your prefer'
+                        style={{
+                            width: '18vw',
+                            marginTop: '0.5vw',
+                            marginBottom: '1.5vw',
+                        }}
+                        onChange={handleChange}
+                        options={option}
+                    />
+                    <Button type="primary" style={{ width: '18vw' }} onClick={handleClick}>Calculate Route</Button>
+                </Col>
 
-  return (
-    <div>
-      <div className="graph-container">
-        <svg width="800" height="600" viewBox="0 0 800 600">
-          <image href={map} width="800" height="400" />
-          {data.data.edges.map((edge, index) => {
-            const sourceNode = data.data.nodes.find((node) => node.id === edge.source);
-            const targetNode = data.data.nodes.find((node) => node.id === edge.target);
-            // This offset calculation allows multiple edges between the same nodes to not overlap
-            // Calculate the angle between the source and target nodes
-            const dx = targetNode.x - sourceNode.x;
-            const dy = targetNode.y - sourceNode.y;
-            const angle = Math.atan2(dy, dx);
+            </Row>
+            <Modal title="Select Start Point" open={isStartPointModalOpen} onOk={handleStartPointOk} onCancel={handleStartPointOk} centered={true}>
+                <p>Select one point from the map!</p>
+            </Modal>
+            <Modal title="Select End Point" open={isEndPointModalOpen} onOk={handleEndPointOk} onCancel={handleEndPointOk} centered={true}>
+                <p>Select one point from the map!</p>
+            </Modal>
+            <Modal title="Choose a Route Option" open={isStrategyModalOpen} onOk={handleStrategyOk} onCancel={handleStrategyOk} centered={true}>
+                <p>Select one strategy from the drop-down box!</p>
+            </Modal>
+        </div>
 
-            // Calculate the offset for the edge
-            const offset = 2;
-            const x1 = sourceNode.x + Math.cos(angle) * offset;
-            const y1 = sourceNode.y + Math.sin(angle) * offset;
-            const x2 = targetNode.x - Math.cos(angle) * offset;
-            const y2 = targetNode.y - Math.sin(angle) * offset;
-            return (
-              <line
-                key={index}
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
-                stroke={
-                  // show the edge in different colors based on the difficulty level
-                  isEdgeHighlighted(edge) ?
-                    edge.difficulty === 'none' ?
-                      'green' :
-                      edge.difficulty === 'easy' ?
-                        'blue' :
-                        edge.difficulty === 'medium' ?
-                          'red' :
-                          edge.difficulty === 'hard' ?
-                            'black'
-                            : 'blue' : 'grey'
-                }
-                strokeWidth="4"
-              >
-                <title>{`${edge.type}\nDifficulty: ${edge.difficulty}`}</title>
-              </line>
-            );
-          })}
-          {data.data.nodes.map((node, index) => (
-            <circle
-              key={index}
-              cx={node.x}
-              cy={node.y}
-              r="20"
-              fill={selectedNodes.start === node.id || selectedNodes.end === node.id ? 'red' : 'black'}
-              onClick={() => handleNodeClick(node.id)}
-            >
-              <title>{`${node.name}`}</title>
-            </circle>
 
-          ))}
-        </svg>
-        {selectedNodes.end && showDifficultyModal && (
-          <div>
-            <h3>Choose a difficulty level:</h3>
-            <select onChange={(val) => handleDifficultySelect(val.target.value)}>
-              <option value="Select Difficulty">Select Difficulty</option>
-              <option value="Begginer">Begginer</option>
-              <option value="Intermediate">Intermediate</option>
-              <option value="Expert">Expert</option>
-              <option value="Professional">Professional</option>
-            </select>
-          </div>
-        )}
-        {routeCalculated && !showDifficultyModal && (
-          <div>
-            <h3>Choose a route option:</h3>
-            <select onChange={(val) => setSelectedRouteOption(val.target.value)}>
-              <option value="all">All Routes</option>
-              <option value="scenic">Scenic Routes</option>
-              <option value="easy">Easy Routes</option>
-              <option value="medium">Medium Routes</option>
-              <option value="difficult">Difficult Routes</option>
-            </select>
-          </div>
-        )}
-      </div>
-      <div>
-        {routeCalculated && !showDifficultyModal && (
-          <button onClick={restartPathFinding} style={{
-            backgroundColor: '#4CAF50', /* Green */
-            border: 'none',
-            color: 'white',
-            padding: '15px 32px',
-            textAlign: 'center',
-            marginLeft: '50px',
-          }}>Restart Path Finding</button>
-        )}
-      </div>
-    </div>
-  );
+
+    );
 };
 
 export default Map;

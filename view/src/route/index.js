@@ -5,7 +5,7 @@ import About from '@/pages/About'
 import Contact from "@/pages/Contact";
 import Map from "@/pages/Map";
 
-import '../pages/Map/map.css';
+
 
 const route = createBrowserRouter([
     {
@@ -29,7 +29,11 @@ const route = createBrowserRouter([
                 element: <Map />
             }
         ]
-    }
+    },
+    // {
+    //     path:'/map',
+    //     element:<Map/>
+    // }
 ])
 
 export default route
