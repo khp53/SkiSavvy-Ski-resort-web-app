@@ -217,7 +217,7 @@
 // export default Map;
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer, ImageOverlay, useMap } from 'react-leaflet';
+import { MapContainer, ImageOverlay, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import '@elfalem/leaflet-curve';
 import imageUrl from '@/assets/map_bg.svg'
@@ -226,7 +226,18 @@ const Map = () => {
   const [startNodeId, setStartNodeId] = useState(null);
   const [endNodeId, setEndNodeId] = useState(null);
   const [shortestPath, setShortestPath] = useState([]);
-  const map = useMap();
+  const map = useMapEvents({
+    dragend: (event) => {
+      const map = event.target;
+    const zoomLevel = map.getZoom();
+
+    if (zoomLevel <= 2) {
+      // Reset the position of the image overlay to the center
+      map.setView([66, 375], 2);
+    }
+    }
+  });
+
 
   const graphData = {
     "nodes": [
@@ -1140,6 +1151,8 @@ const Map = () => {
     ]
   };
 
+  
+
   useEffect(() => {
     graphData.nodes.forEach(node => {
       // Create and add markers for each node
@@ -1296,7 +1309,7 @@ const Map = () => {
 
 const MapWrapper = ({ imageUrl, graphData }) => {
   return (
-    <MapContainer center={[66, 375]} zoom={2} style={{ height: '600px', width: '80%' }}>
+    <MapContainer center={[66, 375]} zoom={2} style={{ height: '500px', width: '100%' }}>
       <Map imageUrl={imageUrl} graphData={graphData} />
     </MapContainer>
   );
