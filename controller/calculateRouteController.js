@@ -22,7 +22,6 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
             if (node.id !== otherNode.id) { // Exclude the current node
                 // check if otherNode is within a certain distance from node
                 const distance = await this.calculateDistance(node.latLng[0], node.latLng[1], otherNode.latLng[0], otherNode.latLng[1]);
-                console.log(distance);
                 if (distance > 1) { // threshold to be adjusted per our implementation
                                     // we can limit the graph traversal to only neighors within a region
                     neighbors.push(otherNode.id);
@@ -99,7 +98,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
             });
         }
     });
-    console.log('transform graph paths to edges: ', edges);
+    //console.log('transform graph paths to edges: ', edges);
     //return edges;
 
     const matchingEdges = [];
@@ -107,9 +106,11 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         graph.edges.forEach(resortEdge => {
             edges.forEach(graphEdge => {
                 if (
-                    resortEdge.direction.source === graphEdge.direction.source &&
-                    resortEdge.direction.target === graphEdge.direction.target &&
-                    resortEdge.difficulty == userProfile
+                    !matchingEdges.some(edge =>
+                        edge.direction.source === resortEdge.direction.source &&
+                        edge.direction.target === resortEdge.direction.target &&
+                        edge.difficulty === resortEdge.difficulty
+                    )
                 ) {
                     matchingEdges.push(resortEdge);
                 }
@@ -120,8 +121,10 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
     graph.edges.forEach(resortEdge => {
         edges.forEach(graphEdge => {
             if (
-                resortEdge.direction.source === graphEdge.direction.source &&
-                resortEdge.direction.target === graphEdge.direction.target
+                !matchingEdges.some(edge =>
+                    edge.direction.source === resortEdge.direction.source &&
+                    edge.direction.target === resortEdge.direction.target
+                )
             ) {
                 matchingEdges.push(resortEdge);
             }
@@ -155,9 +158,9 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         skiResort = {
             "nodes": [
                 { "id": 1, "title": "A", "latLng": [12, 270] },
-                //{ "id": 2, "title": "B", "latLng": [20, 300] },
+                { "id": 2, "title": "B", "latLng": [20, 300] },
                 { "id": 6, "title": "F", "latLng": [65, 292] },
-                //{ "id": 7, "title": "G", "latLng": [62, 314] },
+                { "id": 7, "title": "G", "latLng": [62, 314] },
                 { "id": 8, "title": "H", "latLng": [74, 293] }
             ],
             "edges": [
@@ -230,7 +233,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
                 },
               },
               {
-                "id": 10, "direction": { "source": 1, "target": 6 }, "latLngs": [[12, 270], [74, 293]], "type": "slope",
+                "id": 11, "direction": { "source": 1, "target": 6 }, "latLngs": [[12, 270], [74, 293]], "type": "slope",
                 "isMultipleEdges": false,
                 "difficulty": "medium",
                 "popup": {
@@ -251,7 +254,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         };
         
         start = 1; // ID of start node
-        end = 6; // ID of end node
+        end = 8; // ID of end node
         profile = "medium";
 
         //const routes = []; 
