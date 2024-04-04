@@ -76,9 +76,12 @@ const Map = () => {
             return
         }
 
-        //using API put the strategyChoice to the backend(or use filter from the back data)
+        //using API put the start end point to the backend
+        //get the data then give the data to the MapWithGraph replace the graphData1 in the MapWithGraph component
 
 
+    
+        //the go to the step 2
         setStep(2)
     }
 
@@ -92,6 +95,11 @@ const Map = () => {
             });
             return
         }
+        //use API put the strategy to the backend (or use filter from the back data)
+        //get the data then to the step 3
+
+
+
         setStep(3)
     }
 
@@ -240,6 +248,7 @@ const Map = () => {
                         step === 3 &&
                         <div style={{marginTop:'5vw'}}>
                             <p>
+                                {/* need be replace by the real description from the backend */}
                                 result
                             </p>
                             <div style={{width:'100%',display:'flex'}}>

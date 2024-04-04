@@ -19,7 +19,6 @@ const MapWithGraph = forwardRef((props, ref) => {
     //if father(Map) component click reset buttom, remove the startNodeId
     const resetStart = () => {
         setStartNodeId(null)
-        console.log('hahhaha')
     }
 
     //if father component click reset buttom, remove the endNodeId
@@ -968,54 +967,6 @@ const MapWithGraph = forwardRef((props, ref) => {
 
     }, [startNodeId, endNodeId])
 
-    // useEffect(() => {
-    //     graphData.nodes.forEach(node => {
-    //         // Create and add markers for each node
-    //         const marker = L.marker(node.latLng);
-    //         marker.addTo(map);
-    //         // Add event listener to handle node click
-    //         marker.on('click', () => handleNodeClick(node.id));
-    //         // change marker color
-    //         marker.setIcon(
-    //             node.id === startNodeId || node.id === endNodeId ?
-    //                 L.divIcon({
-    //                     className: 'custom-icon',
-    //                     html: `<div style="background-color: blue; border-radius: 100%; height: 15px; width: 15px;"></div>`,
-    //                 }) :
-    //                 L.divIcon({
-    //                     className: 'custom-icon',
-    //                     html: `<div style="background-color: green; border-radius: 100%; height: 15px; width: 15px;"></div>`,
-    //                 })
-    //         );
-    //         // Add popup for the node on mouseover
-    //         marker.on('mouseover', () => {
-    //             marker.bindPopup(`<b>Node ${node.id}</b>`).openPopup();
-    //         });
-    //         // Close popup on mouseout
-    //         marker.on('mouseout', () => {
-    //             marker.closePopup();
-    //         });
-    //     });
-
-    //     graphData.edges.forEach(edge => {
-    //         const polyline = L.polyline(edge.latLngs);
-    //         polyline.addTo(map);
-    //         polyline.setStyle({ color: 'grey' });
-    //         // Add popup for the edge on mouseover
-    //         polyline.on('mouseover', () => {
-    //             polyline.bindPopup(`<b>Edge ${edge.id}</b>`).openPopup();
-    //         });
-    //         // Close popup on mouseout
-    //         polyline.on('mouseout', () => {
-    //             polyline.closePopup();
-    //         });
-    //         // Highlight edge if it's part of the shortest path
-    //         if (shortestPath.find(pathEdge => pathEdge.id === edge.id)) {
-    //             polyline.setStyle({ color: 'blue' });
-    //         }
-    //     });
-    // }, [map, graphData, shortestPath, startNodeId, endNodeId]);
-
 
     useEffect(() => {
         graphData1.nodes.forEach(node => {
@@ -1146,6 +1097,8 @@ const MapWithGraph = forwardRef((props, ref) => {
             setEndNodeId(nodeId);
         }
     };
+
+    //this need to be open
 
     // useEffect(() => {
     //     // Calculate and set the shortest path when start or end node changes
