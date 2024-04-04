@@ -235,7 +235,7 @@ const Map = () => {
                             />
                             <br />
                             <div style={{width:'100%',display:'flex'}}>
-                                <Button style={{width:'9vw'}} onClick={handleClick3}>previous</Button>
+                                <Button style={{marginLeft:'2vw',width:'9vw'}} onClick={handleClick3}>previous</Button>
                                 {contextHolder}
                                 <Button type="primary" style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} onClick={handleClick2}>Search</Button>
                             </div>
@@ -252,8 +252,8 @@ const Map = () => {
                                 result
                             </p>
                             <div style={{width:'100%',display:'flex'}}>
-                                <Button style={{width:'9vw'}} onClick={handleClick4}>previous</Button>
-                            <Button style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} type='primary' onClick={handleClick5}>reset</Button>
+                                <Button style={{marginLeft:'2vw',width:'9vw'}} onClick={handleClick4}>previous</Button>
+                            <Button style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw',backgroundColor: 'green',color: 'white', }}  onClick={handleClick5}>Reset all</Button>
                             </div>
                             
                         </div>
