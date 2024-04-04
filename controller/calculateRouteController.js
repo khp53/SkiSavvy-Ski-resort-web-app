@@ -31,3 +31,7 @@ class CRController {
 
 module.exports = CRController;
 
+// adjust slope speed to 20 km/h
+// if user does not select a difficulty level dont incorporate it in the calculation.
+// filter out only one route based on user filter.
+// let user select another route if they want to.
