@@ -155,9 +155,9 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         skiResort = {
             "nodes": [
                 { "id": 1, "title": "A", "latLng": [12, 270] },
-                { "id": 2, "title": "B", "latLng": [20, 300] },
+                //{ "id": 2, "title": "B", "latLng": [20, 300] },
                 { "id": 6, "title": "F", "latLng": [65, 292] },
-                { "id": 7, "title": "G", "latLng": [62, 314] },
+                //{ "id": 7, "title": "G", "latLng": [62, 314] },
                 { "id": 8, "title": "H", "latLng": [74, 293] }
             ],
             "edges": [
@@ -251,7 +251,7 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
         };
         
         start = 1; // ID of start node
-        end = 8; // ID of end node
+        end = 6; // ID of end node
         profile = "medium";
 
         //const routes = []; 
