@@ -14,7 +14,7 @@ class SkiResortController {
             const skiResort = await this.SkiResort.findOne();
             return res.status(200).json({ statusCode: 200, message: 'Ski resort retrieved successfully', data: skiResort });
         } catch (error) {
-            console.error("Error fetching ski resort by ID:", error);
+            console.error(error);
             return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
         }
     }

@@ -26,7 +26,9 @@ const route = createBrowserRouter([
             },
             {
                 path: '/map',
-                element: <Map />
+                element: <div>
+                    <Map />
+                </div>
             }
         ]
     },
