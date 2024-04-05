@@ -989,7 +989,7 @@ const MapWithGraph = forwardRef((props, ref) => {
             );
             // Add popup for the node on mouseover
             marker.on('mouseover', () => {
-                marker.bindPopup(`<b>Node ${node.title}</b>`).openPopup();
+                marker.bindPopup(`<b>${node.id}. Node ${node.title}</b>`).openPopup();
             });
             // Close popup on mouseout
             marker.on('mouseout', () => {
@@ -1072,7 +1072,9 @@ const MapWithGraph = forwardRef((props, ref) => {
                     image = 'https://cdn-icons-png.flaticon.com/128/1828/1828843.png';
                 }
 
-                const popupContent = `<div><img src="${image}" alt="Icon" style="width: 20px; height: 20px; margin-right: 5px;"><b>${edge.popup.title}</b><br><p>${edge.popup.subtitle} <b style="color: ${statusColor};">${edge.popup.status}</b></p></div>`;
+                const popupContent = !isLiftEdge ?
+                    `<div><img src="${image}" alt="Icon" style="width: 20px; height: 20px; margin-right: 5px;"><b>${edge.popup.title}</b><br><p>Length: ${edge.popup['additional-info'].length}</p><p>${edge.popup.subtitle} <b style="color: ${statusColor};">${edge.popup.status}</b></p></div>` :
+                    `<div><img src="${image}" alt="Icon" style="width: 20px; height: 20px; margin-right: 5px;"><b>${edge.popup.title}</b><br><p>${edge.popup.subtitle} <b style="color: ${statusColor};">${edge.popup.status}</b></p></div>`;
                 curve.bindPopup(popupContent).openPopup();
             });
 
