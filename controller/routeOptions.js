@@ -134,13 +134,23 @@ class RouteOptions {
     }
 
     selectEasiest(allPaths, graph, difficulties) {
+        let easiestPath = null;
+        let easiestPathScore = Infinity;
+
         for (const path of allPaths) {
             let pathScore = 0;
             let containsSlope = false;
+
             for (let i = 0; i < path.length - 1; i++) {
                 const currentNode = path[i];
                 const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+
+                const edge = graph.edges.find(edge =>
+                    edge.direction &&
+                    edge.direction.source === currentNode.id &&
+                    edge.direction.target === nextNode.id
+                );
+
                 if (edge && edge.type !== "lift") { // Consider only slope edges
                     containsSlope = true;
                     let multiplier = 1; // Default multiplier for easy difficulty
@@ -155,14 +165,16 @@ class RouteOptions {
                     pathScore += length * multiplier;
                 }
             }
-            if (containsSlope && pathScore < this.easiestPathScore) {
-                this.easiestPathScore = pathScore;
-                this.easiestPath = path;
+
+            if (containsSlope && pathScore < easiestPathScore) {
+                easiestPathScore = pathScore;
+                easiestPath = path;
             }
         }
+
         // Easiest path description
-        const easiestPathDescription = this.findOptionalPathDescription(graph, this.easiestPath, false, 0, true, this.easiestPathScore);
-        return { easiestPath: this.easiestPath, easiestPathDescription };
+        const easiestPathDescription = this.findOptionalPathDescription(graph, easiestPath, false, 0, true, easiestPathScore);
+        return { easiestPath, easiestPathDescription };
     }
 
     selectMinimalLiftUsage(allPaths, graph) {
@@ -188,8 +200,8 @@ class RouteOptions {
 
     // Get the shortest path description
     findOptionalPathDescription(graph, routes, isTime = false, time = 0, isEasiest = false, score = 0) {
-        const route = routes.map(node => node.title).join(" -> ");
-        const textDescription = routes.map((node, index) => {
+        const route = routes ? routes.map(node => node.title).join(" -> ") : "";
+        const textDescription = routes ? routes.map((node, index) => {
             if (index === 0) return `From Node ${node.title}`;
             const prevNode = routes[index - 1];
             const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
@@ -200,7 +212,7 @@ class RouteOptions {
                     return `take the ${edge.popup.title} slope to Node ${node.title}`;
                 }
             }
-        }).filter(description => description !== undefined).join(", ");
+        }).filter(description => description !== undefined).join(", ") : "";
         if (isTime) {
             return { route, textDescription, time };
         } else if (isEasiest) {
