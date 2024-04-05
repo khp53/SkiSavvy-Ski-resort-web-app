@@ -6,13 +6,12 @@ import imageUrl from '@/assets/map_bg.svg'
 import imageUrl1 from '@/assets/resortBackground.jpg'
 import 'leaflet/dist/leaflet.css';
 import { fetchMapData } from '@/api/map';
-import { set } from 'mongoose';
 
 
 const MapWithGraph = forwardRef((props, ref) => {
 
     //get father component's function
-    const { getStartNodeId, getEndNodeId, getStartNodeTitleAndLatLng, getEndNodeTitleAndLatLng } = props
+    const { getStartNodeId, getEndNodeId, getStartNodeTitleAndLatLng, getEndNodeTitleAndLatLng, routesData } = props
 
     const [startNodeId, setStartNodeId] = useState(null);
     const [startNodeTitle, setStartNodeTitle] = useState(null);
@@ -24,6 +23,7 @@ const MapWithGraph = forwardRef((props, ref) => {
     const [graphData1, setData] = useState({ data: { nodes: [], edges: [] } });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [routes, setRoutes] = useState(null);
 
     // fetch map data from the API
     useEffect(() => {
@@ -41,6 +41,12 @@ const MapWithGraph = forwardRef((props, ref) => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (routesData) {
+            setRoutes(routesData)
+        }
+    }, [routesData]);
 
     //if father(Map) component click reset buttom, remove the startNodeId
     const resetStart = () => {
@@ -1071,6 +1077,14 @@ const MapWithGraph = forwardRef((props, ref) => {
                 color = 'green';
             }
 
+            // Check if the current edge is in the provided paths
+            let matchingPath = null
+            if (routes) {
+                matchingPath = routes.data.all.allPaths.find(path => {
+                    return path.some(node => node.id === edge.source) && path.some(node => node.id === edge.target);
+                });
+            }
+
             // Create a curved line if it's not a "lift" edge
             const curve = !isLiftEdge && edge.isMultipleEdges === true ?
                 L.curve(
@@ -1078,9 +1092,9 @@ const MapWithGraph = forwardRef((props, ref) => {
                         'M', latLngs[0],
                         'Q', midpointLatLng, latLngs[1],
                     ],
-                    { color: color, weight: 3 }
+                    { color: matchingPath ? 'blue' : color, weight: 3 }
                 ) :
-                L.polyline(latLngs, { color: color, weight: 3 });
+                L.polyline(latLngs, { color: matchingPath ? 'blue' : color, weight: 3 });
 
             curve.addTo(map);
 
@@ -1114,13 +1128,8 @@ const MapWithGraph = forwardRef((props, ref) => {
             curve.on('mouseout', () => {
                 curve.closePopup();
             });
-
-            // Highlight edge if it's part of the shortest path
-            if (shortestPath.find(pathEdge => pathEdge.id === edge.id)) {
-                curve.setStyle({ color: 'grey' });
-            }
         });
-    }, [map, graphData1, shortestPath, startNodeId, endNodeId]);
+    }, [map, graphData1, routes, startNodeId, endNodeId]);
 
     const handleNodeClick = (nodeId) => {
         if (startNodeId === null) {

@@ -6,6 +6,7 @@ import { Select, Button } from 'antd';
 import { fetchCalculatedRoute } from '@/api/map';
 import { sendSelections } from '@/api/map';
 import { current } from '@reduxjs/toolkit';
+import PathDescriptions from './components/PathDescription'
 import { set } from 'mongoose';
 
 
@@ -38,6 +39,20 @@ const Map = () => {
 
   //alert no startpoint or endpoint
   const [messageApi, contextHolder] = message.useMessage()
+
+  // set the path data to the MapWithGraph component
+  const [routesData, setRoutesData] = useState(null);
+  // set shortest path
+  const [shortPath, setShortPath] = useState(null);
+  // set quickest path
+  const [quickPath, setQuickPath] = useState(null);
+  // set easiest path
+  const [easyPath, setEasyPath] = useState(null);
+  // set minimal lift path
+  const [minLiftPath, setMinLiftPath] = useState(null);
+
+  // data for description
+  const [filteredDesc, setFilteredDesc] = useState(null);
 
   //get the customer start point from the son component (MapWithGraph)
   const getStartNodeId = (data) => [
@@ -121,6 +136,7 @@ const Map = () => {
         const routes = await fetchCalculatedRoute();
         //setData(data);
         console.log(routes);
+        setRoutesData(routes);
         //the go to the step 2
         setStep(2)
       } catch (error) {
@@ -143,10 +159,33 @@ const Map = () => {
     }
     //use API put the strategy to the backend (or use filter from the back data)
     //get the data then to the step 3
-
-
-
-    setStep(3)
+    if (routesData) {
+      if (strategyChoice === 'shortest') {
+        const shortPath = routesData.data.short
+        console.log(shortPath)
+        setShortPath(shortPath)
+        setFilteredDesc(shortPath.shortestPathDescription)
+        setStep(3)
+      } else if (strategyChoice === 'quickest') {
+        const quickPath = routesData.data.time
+        console.log(quickPath)
+        setQuickPath(quickPath)
+        setFilteredDesc(quickPath.quickestPathDescription)
+        setStep(3)
+      } else if (strategyChoice === 'easiest') {
+        const easyPath = routesData.data.easy
+        console.log(easyPath)
+        setEasyPath(easyPath)
+        setFilteredDesc(easyPath.easiestPathDescription)
+        setStep(3)
+      } else if (strategyChoice === 'minimal') {
+        const minLiftPath = routesData.data.minLift
+        console.log(minLiftPath)
+        setMinLiftPath(minLiftPath)
+        setFilteredDesc(minLiftPath.minLiftsPathDescription)
+        setStep(3)
+      }
+    }
   }
 
 
@@ -243,6 +282,7 @@ const Map = () => {
               getEndNodeId={getEndNodeId}
               getStartNodeTitleAndLatLng={getStartNodeTitleAndLatLng}
               getEndNodeTitleAndLatLng={getEndNodeTitleAndLatLng}
+              routesData={routesData}
               ref={childRef}
             />
           </MapContainer>
@@ -260,9 +300,9 @@ const Map = () => {
                 <Button ref={ref2} value="small" style={{ marginLeft: '5vw' }} onClick={resetEndPoint}>Reset</Button>
               </div>
               <Checkbox.Group value={difficulty} onChange={handleDifficutyChange} style={{ marginLeft: '6vw', marginBottom: '1vw' }}>
-                <Checkbox value="blue" style={{ color: 'blue' }}>Blue</Checkbox>
-                <Checkbox value="red" style={{ color: 'red' }}>Red</Checkbox>
-                <Checkbox value="black" style={{ color: 'black' }}>black</Checkbox>
+                <Checkbox value="easy" style={{ color: 'blue' }}>Blue</Checkbox>
+                <Checkbox value="medium" style={{ color: 'red' }}>Red</Checkbox>
+                <Checkbox value="difficult" style={{ color: 'black' }}>Black</Checkbox>
               </Checkbox.Group>
               <br />
               {contextHolder}
@@ -291,25 +331,22 @@ const Map = () => {
                 {contextHolder}
                 <Button type="primary" style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} onClick={handleClick2}>Search</Button>
               </div>
-
-
             </div>
           }
 
-          {
+          {/* {
             step === 3 &&
             <div style={{ marginTop: '5vw' }}>
-              <p>
-                {/* need be replace by the real description from the backend */}
-                result
-              </p>
+              <PathDescriptions pathsWithDescriptions={routesData ?
+                filteredDesc
+                : null} isStartegy={true} />
               <div style={{ width: '100%', display: 'flex' }}>
                 <Button style={{ marginLeft: '2vw', width: '9vw' }} onClick={handleClick4}>previous</Button>
                 <Button style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw', backgroundColor: 'green', color: 'white', }} onClick={handleClick5}>Reset all</Button>
               </div>
 
             </div>
-          }
+          } */}
           {/* Tour box */}
           <Tour open={open} onClose={() => setOpen(false)} steps={steps} scrollIntoViewOptions={true}
             indicatorsRender={(current, total) => (
@@ -321,10 +358,25 @@ const Map = () => {
         </Col>
 
       </Row>
-
+      {
+        step === 3 ?
+          <div style={{ marginTop: '5vw', marginLeft: '5vw' }}>
+            <PathDescriptions pathsWithDescriptions={routesData ?
+              filteredDesc
+              : null} isStartegy={true} title={strategyChoice} />
+            <div style={{ width: '100%', display: 'flex' }}>
+              <Button style={{ marginLeft: '2vw', width: '9vw' }} onClick={handleClick4}>previous</Button>
+              <Button style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw', backgroundColor: 'green', color: 'white', }} onClick={handleClick5}>Reset all</Button>
+            </div>
+          </div >
+          :
+          <div style={{ marginTop: '5vw', marginLeft: '5vw' }}>
+            <PathDescriptions pathsWithDescriptions={routesData ?
+              routesData.data.all.pathsWithDescriptions
+              : []} isStartegy={false} title={"All Path"} />
+          </div>
+      }
     </div >
-
-
   );
 };
 
