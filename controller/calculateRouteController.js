@@ -16,24 +16,28 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
 }
     async findNeighbors(graph, node) {
         // This function should return an array of neighboring node IDs
-        //console.log('get neigbors of ', node)
+        console.log('get neigbors of ', node)
         const neighbors = [];
         for (const otherNode of graph.nodes) {
             if (node.id !== otherNode.id) { // Exclude the current node
                 // check if otherNode is within a certain distance from node
-                const distance = await this.calculateDistance(node.latLng[0], node.latLng[1], otherNode.latLng[0], otherNode.latLng[1]);
-                if (distance > 1) { // threshold to be adjusted per our implementation
+                if (node != null && node.latLng.length != 0){
+                    const distance = await this.calculateDistance(node.latLng[0], node.latLng[1], otherNode.latLng[0], otherNode.latLng[1]);
+                if (distance > 1 ) { // threshold to be adjusted per our implementation
                                     // we can limit the graph traversal to only neighors within a region
                     neighbors.push(otherNode.id);
                 }
+                }
+                
             }
         }
         return neighbors;
     }
 
     async findPathsUtil(graph, visited, startNodeId, endNodeId, path, paths) {
-        
-        const startNode = graph.nodes.find(node => node.id === startNodeId);
+        const jsonString = JSON.stringify(graph);
+        const parseGraph = JSON.parse(jsonString);
+        const startNode = parseGraph.nodes.find(node => node.id === startNodeId);
     
         // Mark the current node as visited and add it to the path
         visited[startNode.id] = true;
@@ -46,14 +50,14 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
             //return; // Exit the function since we've found a valid path
         } 
         else{  // If not, continue exploring neighbors
-            const neighbors = await this.findNeighbors(graph, startNode); // Find neighbors dynamically
+            const neighbors = await this.findNeighbors(parseGraph, startNode); // Find neighbors dynamically
             //console.log("before for loop, neighbors=", neighbors);
             for (const neighborId of neighbors) {
                 if (!visited[neighborId]) {
                     //await this.findPathsUtil(graph, visited, neighbor.id, endNodeId, path, paths);
                     //console.log("recalling findPathsUtil of neighborId=", neighborId);
                     //await this.findPathsUtil(graph, Object.assign({}, visited), neighborId, endNodeId, [...path], paths);
-                    await this.findPathsUtil(graph, visited, neighborId, endNodeId, [...path], paths);
+                    await this.findPathsUtil(parseGraph, visited, neighborId, endNodeId, [...path], paths);
                 }
             }
         }
@@ -121,10 +125,8 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
     graph.edges.forEach(resortEdge => {
         edges.forEach(graphEdge => {
             if (
-                !matchingEdges.some(edge =>
-                    edge.direction.source === resortEdge.direction.source &&
-                    edge.direction.target === resortEdge.direction.target
-                )
+                graphEdge.direction.source === resortEdge.direction.source &&
+                graphEdge.direction.target === resortEdge.direction.target
             ) {
                 matchingEdges.push(resortEdge);
             }
@@ -142,7 +144,8 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
     async calculateAllRoutes(req, res) {
         try {
             const skiResortController = req.resortController;
-            const firstSkiResort = await skiResortController.getTheFirstSkiResort.bind(skiResortController);
+            const firstSkiResort = await skiResortController.getTheFirstSkiResortData.bind(skiResortController)();
+            console.log(firstSkiResort);
             const routeSelectionController = req.routeSelectionController;
             const selectedRoute = await routeSelectionController.getFirstSelection.bind(routeSelectionController);
             const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
@@ -155,104 +158,106 @@ async calculateDistance(lat1, lon1, lat2, lon2) {
 
     // calculate all possible paths between the first ski resort and the first route
     async calculateRoutes(skiResort, start, end, profile) {
-        skiResort = {
-            "nodes": [
-                { "id": 1, "title": "A", "latLng": [12, 270] },
-                { "id": 2, "title": "B", "latLng": [20, 300] },
-                { "id": 6, "title": "F", "latLng": [65, 292] },
-                { "id": 7, "title": "G", "latLng": [62, 314] },
-                { "id": 8, "title": "H", "latLng": [74, 293] }
-            ],
-            "edges": [
-              {
-                "id": 1, "direction": { "source": 2, "target": 1 }, "latLngs": [[20, 300], [12, 270]], "type": "slope",
-                "isMultipleEdges": false,
-                "difficulty": "medium",
-                "popup": {
-                  "lynx-type": "slope",
-                  "title": "20 FIS - Abfahrt",
-                  "additional-info": {
-                    "length": 2150,
-                    "length-open": 0
-                  },
-                  "oid": "30433",
-                  "status": "open",
-                  "id": "81538",
-                  "subtitle": "slope (medium)",
-                  "clients-sub-id": 2615
-                },
-              },
-              {
-                "id": 7, "direction": { "source": 7, "target": 2 }, "latLngs": [[62, 314], [20, 300]], "type": "slope",
-                "isMultipleEdges": false,
-                "difficulty": "medium",
-                "popup": {
-                  "lynx-type": "slope",
-                  "title": "20 FIS - Abfahrt",
-                  "additional-info": {
-                    "length": 2150,
-                    "length-open": 0
-                  },
-                  "oid": "30433",
-                  "status": "open",
-                  "id": "81538",
-                  "subtitle": "slope (medium)",
-                  "clients-sub-id": 2615
-                },
-              },
+        //console.log('initiate calculate route')
+
+        // skiResort = {
+        //     "nodes": [
+        //         { "id": 1, "title": "A", "latLng": [12, 270] },
+        //         { "id": 2, "title": "B", "latLng": [20, 300] },
+        //         { "id": 6, "title": "F", "latLng": [65, 292] },
+        //         { "id": 7, "title": "G", "latLng": [62, 314] },
+        //         { "id": 8, "title": "H", "latLng": [74, 293] }
+        //     ],
+        //     "edges": [
+        //       {
+        //         "id": 1, "direction": { "source": 2, "target": 1 }, "latLngs": [[20, 300], [12, 270]], "type": "slope",
+        //         "isMultipleEdges": false,
+        //         "difficulty": "medium",
+        //         "popup": {
+        //           "lynx-type": "slope",
+        //           "title": "20 FIS - Abfahrt",
+        //           "additional-info": {
+        //             "length": 2150,
+        //             "length-open": 0
+        //           },
+        //           "oid": "30433",
+        //           "status": "open",
+        //           "id": "81538",
+        //           "subtitle": "slope (medium)",
+        //           "clients-sub-id": 2615
+        //         },
+        //       },
+        //       {
+        //         "id": 7, "direction": { "source": 7, "target": 2 }, "latLngs": [[62, 314], [20, 300]], "type": "slope",
+        //         "isMultipleEdges": false,
+        //         "difficulty": "medium",
+        //         "popup": {
+        //           "lynx-type": "slope",
+        //           "title": "20 FIS - Abfahrt",
+        //           "additional-info": {
+        //             "length": 2150,
+        //             "length-open": 0
+        //           },
+        //           "oid": "30433",
+        //           "status": "open",
+        //           "id": "81538",
+        //           "subtitle": "slope (medium)",
+        //           "clients-sub-id": 2615
+        //         },
+        //       },
             
-              {
-                "id": 9, "direction": { "source": 1, "target": 7 }, "latLngs": [[12, 270], [62, 314]], "type": "lift",
-                "isMultipleEdges": false,
-                "popup": {
-                  "lynx-type": "lift",
-                  "title": "Turrachbahn",
-                  "oid": "29858",
-                  "status": "open",
-                  "id": "8152",
-                  "subtitle": "6-chair lift",
-                  "clients-sub-id": 2605
-                },
-              },
-              {
-                "id": 10, "direction": { "source": 6, "target": 1 }, "latLngs": [[65, 292], [12, 270]], "type": "slope",
-                "isMultipleEdges": false,
-                "difficulty": "medium",
-                "popup": {
-                  "lynx-type": "slope",
-                  "title": "21 Eisenhutabfahrt",
-                  "additional-info": {
-                    "length": 1550,
-                    "length-open": 0
-                  },
-                  "oid": "30436",
-                  "status": "open",
-                  "id": "81539",
-                  "subtitle": "slope (medium)",
-                  "clients-sub-id": 2615
-                },
-              },
-              {
-                "id": 11, "direction": { "source": 1, "target": 6 }, "latLngs": [[12, 270], [74, 293]], "type": "slope",
-                "isMultipleEdges": false,
-                "difficulty": "medium",
-                "popup": {
-                  "lynx-type": "slope",
-                  "title": "21 Eisenhutabfahrt",
-                  "additional-info": {
-                    "length": 1550,
-                    "length-open": 0
-                  },
-                  "oid": "30436",
-                  "status": "open",
-                  "id": "81539",
-                  "subtitle": "slope (medium)",
-                  "clients-sub-id": 2615
-                },
-              },
-            ]
-        };
-        
+        //       {
+        //         "id": 9, "direction": { "source": 1, "target": 7 }, "latLngs": [[12, 270], [62, 314]], "type": "lift",
+        //         "isMultipleEdges": false,
+        //         "popup": {
+        //           "lynx-type": "lift",
+        //           "title": "Turrachbahn",
+        //           "oid": "29858",
+        //           "status": "open",
+        //           "id": "8152",
+        //           "subtitle": "6-chair lift",
+        //           "clients-sub-id": 2605
+        //         },
+        //       },
+        //       {
+        //         "id": 10, "direction": { "source": 6, "target": 1 }, "latLngs": [[65, 292], [12, 270]], "type": "slope",
+        //         "isMultipleEdges": false,
+        //         "difficulty": "medium",
+        //         "popup": {
+        //           "lynx-type": "slope",
+        //           "title": "21 Eisenhutabfahrt",
+        //           "additional-info": {
+        //             "length": 1550,
+        //             "length-open": 0
+        //           },
+        //           "oid": "30436",
+        //           "status": "open",
+        //           "id": "81539",
+        //           "subtitle": "slope (medium)",
+        //           "clients-sub-id": 2615
+        //         },
+        //       },
+        //       {
+        //         "id": 11, "direction": { "source": 1, "target": 6 }, "latLngs": [[12, 270], [74, 293]], "type": "slope",
+        //         "isMultipleEdges": false,
+        //         "difficulty": "medium",
+        //         "popup": {
+        //           "lynx-type": "slope",
+        //           "title": "21 Eisenhutabfahrt",
+        //           "additional-info": {
+        //             "length": 1550,
+        //             "length-open": 0
+        //           },
+        //           "oid": "30436",
+        //           "status": "open",
+        //           "id": "81539",
+        //           "subtitle": "slope (medium)",
+        //           "clients-sub-id": 2615
+        //         },
+        //       },
+        //     ]
+        // };
+
         start = 1; // ID of start node
         end = 8; // ID of end node
         profile = "medium";

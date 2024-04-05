@@ -5,6 +5,7 @@ class SkiResortController {
         this.skiResort = new Resort();
         this.SkiResort = this.skiResort.getResortModel();
         this.getTheFirstSkiResort = this.getTheFirstSkiResort.bind(this);
+        this.getTheFirstSkiResortData = this.getTheFirstSkiResortData.bind(this);
         this.getAllSkiResorts = this.getAllSkiResorts.bind(this);
         this.getSkiResortById = this.getSkiResortById.bind(this);
     }
@@ -16,6 +17,16 @@ class SkiResortController {
         } catch (error) {
             console.error(error);
             return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+        }
+    }
+
+    async getTheFirstSkiResortData() {
+        try {
+            const skiResort = await this.SkiResort.findOne();
+            return skiResort;
+        } catch (error) {
+            console.error(error);
+            return null;
         }
     }
 
