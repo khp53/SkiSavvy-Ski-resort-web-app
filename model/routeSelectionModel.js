@@ -37,10 +37,10 @@ class RouteSelection {
                 }]
             },
             profile: {
-                difficulty: {
+                difficulty: [{
                     type: String,
                     required: true
-                }
+                }]
             }
         });
     }
