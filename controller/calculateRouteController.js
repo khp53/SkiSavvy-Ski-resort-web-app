@@ -11,13 +11,13 @@ class CRController {
         try {
             const skiResortController = req.resortController;
             const firstSkiResort = await skiResortController.getFirstSkiResortData.bind(skiResortController)();
-            console.log(firstSkiResort);
-            console.log(firstSkiResort.edges.direction);
             // const firstSkiResort = await this.SkiResort.findOne();
             const routeSelectionController = req.routeSelectionController;
             const selectedRoute = await routeSelectionController.getFirstSelection.bind(routeSelectionController);
             //const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
-            const routes = await this.calculateRoutes(firstSkiResort, 6, 2, selectedRoute.profile);
+            const firstSkiResortString = JSON.stringify(firstSkiResort);
+            const firstSkiResortParsed = JSON.parse(firstSkiResortString);
+            const routes = await this.calculateRoutes(firstSkiResortParsed, 1, 7, selectedRoute.profile);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);
@@ -32,6 +32,7 @@ class CRController {
     }
 
     findAllPaths(graph, startNodeId, endNodeId, shortestPath = [], visited = new Set(), currentPath = [], allPaths = []) {
+
         // Check if graph.nodes array exists
         if (!graph.nodes || graph.nodes.length === 0) {
             return [];
@@ -42,7 +43,6 @@ class CRController {
         if (!currentNode) {
             return [];
         }
-
         // Add current node to current path
         currentPath.push(currentNode);
 
@@ -54,7 +54,7 @@ class CRController {
             allPaths.push([...currentPath]);
         } else {
             // Explore neighbors
-            const edges = graph.edges.filter(edge => edge.direction.source === startNodeId);
+            const edges = graph.edges.filter(edge => edge.direction && edge.direction.source === startNodeId);
             for (const edge of edges) {
                 const neighborId = edge.direction.target;
                 if (!visited.has(neighborId)) {
@@ -69,31 +69,32 @@ class CRController {
 
         // Check if the current path is part of the shortest path
         const pathEdges = allPaths[allPaths.length - 1]; // Last path added to allPaths
-        pathEdges.forEach(pathEdge => {
-            if (shortestPath.find(shortestPathEdge => shortestPathEdge.id === pathEdge.id)) {
-                pathEdge.highlighted = true;
-            } else {
-                pathEdge.highlighted = false;
-            }
-        });
-
-        const textDescription = currentPath.map((node, index) => {
-            if (index === 0) return `From Node ${node.title}`;
-            const prevNode = currentPath[index - 1];
-            const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
-            if (edge) {
-                if (edge.type === "lift") {
-                    return `take the ${edge.popup.title} lift to Node ${node.title}`;
+        if (pathEdges && shortestPath.length > 0) {
+            pathEdges.forEach(pathEdge => {
+                if (shortestPath.find(shortestPathEdge => shortestPathEdge.id === pathEdge.id)) {
+                    pathEdge.highlighted = true;
                 } else {
-                    return `take the ${edge.popup.title} slope to Node ${node.title}`;
+                    pathEdge.highlighted = false;
                 }
-            }
-        }).filter(description => description !== undefined).join(", ");
+            });
+        }
 
-        return {
-            paths: allPaths.map(path => path.map(node => node.title)),
-            textDescription: textDescription
-        };
+        return allPaths.map(path => {
+            const route = path.map(node => node.title).join(" -> ");
+            const textDescription = path.map((node, index) => {
+                if (index === 0) return `From Node ${node.title}`;
+                const prevNode = path[index - 1];
+                const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
+                if (edge) {
+                    if (edge.type === "lift") {
+                        return `take the ${edge.popup.title} lift to Node ${node.title}`;
+                    } else {
+                        return `take the ${edge.popup.title} slope to Node ${node.title}`;
+                    }
+                }
+            }).filter(description => description !== undefined).join(", ");
+            return { allPaths, textDescription };
+        });
     }
 }
 
