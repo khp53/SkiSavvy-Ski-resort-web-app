@@ -1,14 +1,21 @@
 import { request } from "@/utils";
 
-export function getMapSlopeAPI() {
-    return request({
-        url:'/api/resort',
-        method:'GET',
-    })
+export async function fetchMapData() {
+    try {
+        const response = await fetch('http://localhost:4000/api/resort');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error;
+    }
 }
 export function sentPathAPI() {
     return request({
-        url:'/api/path',
-        method:'POST',
+        url: '/api/path',
+        method: 'POST',
     })
 }
