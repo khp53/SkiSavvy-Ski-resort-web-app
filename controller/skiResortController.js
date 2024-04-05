@@ -29,31 +29,6 @@ class SkiResortController {
             return null;
         }
     }
-
-    async getAllSkiResorts(req, res) {
-        try {
-            // Retrieve all SkiResort documents
-            const skiResorts = await this.SkiResort.find();
-            return res.status(200).json({ statusCode: 200, message: 'Ski resort retrived successfully', data: skiResorts });
-        } catch (error) {
-            console.error("Error fetching ski resorts:", error);
-            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
-        }
-    }
-
-    async getSkiResortById(req, res, id) {
-        try {
-            // Retrieve a SkiResort document by ID
-            const skiResort = await this.SkiResort.findById(id);
-            if (!skiResort) {
-                return res.status(404).json({ statusCode: 404, message: 'Ski resort not found', data: null });
-            }
-            return res.status(200).json({ statusCode: 200, message: 'Ski resort retrieved successfully', data: skiResort });
-        } catch (error) {
-            console.error("Error fetching ski resort by ID:", error);
-            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
-        }
-    }
 }
 
 module.exports = SkiResortController;
