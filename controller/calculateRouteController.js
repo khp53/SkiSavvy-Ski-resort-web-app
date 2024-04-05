@@ -17,7 +17,7 @@ class CRController {
             //const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
             const firstSkiResortString = JSON.stringify(firstSkiResort);
             const firstSkiResortParsed = JSON.parse(firstSkiResortString);
-            const routes = await this.calculateRoutes(firstSkiResortParsed, 31, 33, selectedRoute.profile);
+            const routes = await this.calculateRoutes(firstSkiResortParsed, 7, 1, selectedRoute.profile);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);
@@ -27,7 +27,7 @@ class CRController {
 
     // calculate all possible paths between the first ski resort and the first route
     async calculateRoutes(data, startId, endId, profile) {
-        let difficulties = ["difficult"];
+        let difficulties = [];
         let routes = this.findAllPaths(data, startId, endId, difficulties);
         return routes;
     }
@@ -58,8 +58,17 @@ class CRController {
             const edges = graph.edges.filter(edge => edge.direction && edge.direction.source === startNodeId);
             for (const edge of edges) {
                 const neighborId = edge.direction.target;
-                if (!visited.has(neighborId) && difficulties.includes(edge.difficulty)) {
-                    this.findAllPaths(graph, neighborId, endNodeId, difficulties, shortestPath, visited, currentPath, allPaths);
+                if (!visited.has(neighborId)) {
+                    // Check if edge is of type "lift" and include it in the paths
+                    if (edge.type === "lift" || (difficulties.length === 0 || (difficulties.includes(edge.difficulty) && edge.type === "slope"))) {
+                        if (edge.popup["additional-info"] && edge.popup["additional-info"].length) {
+                            shortestPath.push({ id: edge.id, length: edge.popup["additional-info"].length });
+                        }
+                        this.findAllPaths(graph, neighborId, endNodeId, difficulties, shortestPath.slice(), visited, currentPath.slice(), allPaths);
+                        if (edge.popup["additional-info"] && edge.popup["additional-info"].length) {
+                            shortestPath.pop();
+                        }
+                    }
                 }
             }
         }
@@ -68,7 +77,36 @@ class CRController {
         currentPath.pop();
         visited.delete(startNodeId);
 
-        return allPaths.map(path => {
+        // Filter out shortest path based on edge lengths
+        let shortestPathLength = Infinity;
+        let shortestPathRoute = [];
+        for (const path of allPaths) {
+            const pathIds = path.map(node => node.id);
+            const pathLength = shortestPath.reduce((totalLength, edge) => {
+                if (pathIds.includes(edge.id)) {
+                    return totalLength + edge.length;
+                }
+                return totalLength;
+            }, 0);
+            if (pathLength <= shortestPathLength) {
+                shortestPathLength = pathLength;
+                shortestPathRoute = path;
+            }
+        }
+
+        // Generate text description for each path
+        const pathsWithDescriptions = this.findAllPathDescriptions(graph, allPaths);
+
+        // Shortest path description
+        const shortestPathDescription = this.findShortestPathDescription(graph, shortestPathRoute);
+
+        return {
+            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }
+        };
+    }
+
+    findAllPathDescriptions(graph, allPaths) {
+        const pathsWithDescriptions = allPaths.map(path => {
             const route = path.map(node => node.title).join(" -> ");
             const textDescription = path.map((node, index) => {
                 if (index === 0) return `From Node ${node.title}`;
@@ -82,8 +120,27 @@ class CRController {
                     }
                 }
             }).filter(description => description !== undefined).join(", ");
-            return { allPaths, textDescription };
+            return { route, textDescription };
         });
+        return pathsWithDescriptions;
+    }
+
+    // Get the shortest path description
+    findShortestPathDescription(graph, shortestPathRoute) {
+        const route = shortestPathRoute.map(node => node.title).join(" -> ");
+        const textDescription = shortestPathRoute.map((node, index) => {
+            if (index === 0) return `From Node ${node.title}`;
+            const prevNode = shortestPathRoute[index - 1];
+            const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
+            if (edge) {
+                if (edge.type === "lift") {
+                    return `take the ${edge.popup.title} lift to Node ${node.title}`;
+                } else {
+                    return `take the ${edge.popup.title} slope to Node ${node.title}`;
+                }
+            }
+        }).filter(description => description !== undefined).join(", ");
+        return { route, textDescription };
     }
 }
 
