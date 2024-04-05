@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer } from 'react-leaflet';
 import MapWithGraph from './components/MapWithGraph';
 import { Select, Button } from 'antd';
+import { fetchCalculatedRoute } from '@/api/map';
 import { current } from '@reduxjs/toolkit';
 
 
@@ -65,7 +66,7 @@ const Map = () => {
   };
 
   //verify is valid (already select start and end point or not, is valid then to the step2)
-  const handleClick = () => {
+  const handleClick = async () => {
     if (startNodeId === null || endNodeId === null) {
       messageApi.open({
         type: 'warning',
@@ -78,7 +79,15 @@ const Map = () => {
     //using API put the start end point to the backend
     //get the data then give the data to the MapWithGraph replace the graphData1 in the MapWithGraph component
 
-
+    try {
+      const data = await fetchCalculatedRoute();
+      //setData(data);
+      console.log(data);
+    } catch (error) {
+      //setError(error);
+      //setLoading(false);
+      alert('Error fetching data:', error);
+    }
 
     //the go to the step 2
     setStep(2)
@@ -112,7 +121,7 @@ const Map = () => {
     setStep(2)
   }
 
-  //reset buttom, clear all include the son component's(MapWithGraph) start and end point
+  //reset button, clear all include the son component's(MapWithGraph) start and end point
   const handleClick5 = () => {
     setStep(1)
     setStartNodeId(null)
@@ -234,7 +243,7 @@ const Map = () => {
               />
               <br />
               <div style={{ width: '100%', display: 'flex' }}>
-                <Button style={{ marginLeft: '2vw', width: '9vw' }} onClick={handleClick3}>previous</Button>
+                <Button style={{ marginLeft: '2vw', width: '9vw' }} onClick={handleClick3}>Previous</Button>
                 {contextHolder}
                 <Button type="primary" style={{ width: '9vw', marginLeft: '3vw', marginBottom: '4vw' }} onClick={handleClick2}>Search</Button>
               </div>
