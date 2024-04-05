@@ -17,7 +17,7 @@ class CRController {
             //const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
             const firstSkiResortString = JSON.stringify(firstSkiResort);
             const firstSkiResortParsed = JSON.parse(firstSkiResortString);
-            const routes = await this.calculateRoutes(firstSkiResortParsed, 7, 1, selectedRoute.profile);
+            const routes = await this.calculateRoutes(firstSkiResortParsed, 28, 26, selectedRoute.profile);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);
@@ -151,6 +151,26 @@ class CRController {
             }
         }
 
+        // Find path with minimal lift usage
+        let minLiftsPath = [];
+        let minLiftsCount = Infinity;
+
+        for (const path of allPaths) {
+            let liftCount = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                const currentNode = path[i];
+                const nextNode = path[i + 1];
+                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+                if (edge && edge.type === "lift") {
+                    liftCount++;
+                }
+            }
+            if (liftCount < minLiftsCount) {
+                minLiftsCount = liftCount;
+                minLiftsPath = path;
+            }
+        }
+
         // Generate text description for each path
         const pathsWithDescriptions = this.findAllPathDescriptions(graph, allPaths);
 
@@ -163,9 +183,12 @@ class CRController {
         // Easiest path description
         const easiestPathDescription = this.findOptionalPathDescription(graph, easiestPath, false, 0, true, easiestPathScore);
 
+        // Minimal lifts path description
+        const minLiftsDescription = this.findOptionalPathDescription(graph, minLiftsPath, false, 0, false, 0);
+
         return {
             all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }, time: { shortestTimeRoute, shortestTimeDescription },
-            easy: { easiestPath, easiestPathDescription }
+            easy: { easiestPath, easiestPathDescription }, minLift: { minLiftsPath, minLiftsDescription }
         };
     }
 
