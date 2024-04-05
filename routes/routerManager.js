@@ -15,9 +15,9 @@ class RouterManager {
         const routeSelectionController = new RouteSelectionController();
 
         this.router.get('/resort', resortController.getTheFirstSkiResort.bind(resortController));
-        this.router.post('/route', routeSelectionController.insertSelection.bind(routeSelectionController));
-        this.router.get('/route/all', routeSelectionController.getAllSelection.bind(routeSelectionController));
-        this.router.get('/route/find/new', routeSelectionController.getFirstSelection.bind(routeSelectionController));
+        this.router.post('/selection', routeSelectionController.insertSelection.bind(routeSelectionController));
+        this.router.get('/selection/all', routeSelectionController.getAllSelection.bind(routeSelectionController));
+        this.router.get('/selection/find/new', routeSelectionController.getFirstSelection.bind(routeSelectionController));
         this.router.get('/route/calculate/all', (req, res, next) => {
             req.resortController = resortController;
             req.routeSelectionController = routeSelectionController;
