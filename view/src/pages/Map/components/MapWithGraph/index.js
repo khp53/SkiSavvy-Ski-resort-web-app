@@ -6,15 +6,20 @@ import imageUrl from '@/assets/map_bg.svg'
 import imageUrl1 from '@/assets/resortBackground.jpg'
 import 'leaflet/dist/leaflet.css';
 import { fetchMapData } from '@/api/map';
+import { set } from 'mongoose';
 
 
 const MapWithGraph = forwardRef((props, ref) => {
 
     //get father component's function
-    const { getStartNodeId, getEndNodeId } = props
+    const { getStartNodeId, getEndNodeId, getStartNodeTitleAndLatLng, getEndNodeTitleAndLatLng } = props
 
     const [startNodeId, setStartNodeId] = useState(null);
+    const [startNodeTitle, setStartNodeTitle] = useState(null);
+    const [startNodeLatLng, setStartNodeLatLng] = useState([]);
     const [endNodeId, setEndNodeId] = useState(null);
+    const [endNodeTitle, setEndNodeTitle] = useState(null);
+    const [endNodeLatLng, setEndNodeLatLng] = useState([]);
     const [shortestPath, setShortestPath] = useState([]);
     const [graphData1, setData] = useState({ data: { nodes: [], edges: [] } });
     const [loading, setLoading] = useState(true);
@@ -40,11 +45,15 @@ const MapWithGraph = forwardRef((props, ref) => {
     //if father(Map) component click reset buttom, remove the startNodeId
     const resetStart = () => {
         setStartNodeId(null)
+        setStartNodeTitle(null)
+        setStartNodeLatLng(null)
     }
 
     //if father component click reset buttom, remove the endNodeId
     const resetEnd = () => {
         setEndNodeId(null)
+        setEndNodeTitle(null)
+        setEndNodeLatLng(null)
     }
 
     //back the function to the father component
@@ -985,8 +994,9 @@ const MapWithGraph = forwardRef((props, ref) => {
     useEffect(() => {
         getStartNodeId(startNodeId)
         getEndNodeId(endNodeId)
-
-    }, [startNodeId, endNodeId])
+        getStartNodeTitleAndLatLng(startNodeTitle, startNodeLatLng)
+        getEndNodeTitleAndLatLng(endNodeTitle, endNodeLatLng)
+    }, [startNodeId, endNodeId, startNodeTitle, startNodeLatLng, endNodeTitle, endNodeLatLng])
 
 
     useEffect(() => {
@@ -1115,8 +1125,12 @@ const MapWithGraph = forwardRef((props, ref) => {
     const handleNodeClick = (nodeId) => {
         if (startNodeId === null) {
             setStartNodeId(nodeId);
+            setStartNodeTitle(graphData1.data.nodes.find(node => node.id === nodeId).title);
+            setStartNodeLatLng(graphData1.data.nodes.find(node => node.id === nodeId).latLng);
         } else if (endNodeId === null) {
             setEndNodeId(nodeId);
+            setEndNodeTitle(graphData1.data.nodes.find(node => node.id === nodeId).title);
+            setEndNodeLatLng(graphData1.data.nodes.find(node => node.id === nodeId).latLng);
         }
     };
 

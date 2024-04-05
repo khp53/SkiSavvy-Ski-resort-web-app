@@ -4,7 +4,9 @@ import { MapContainer } from 'react-leaflet';
 import MapWithGraph from './components/MapWithGraph';
 import { Select, Button } from 'antd';
 import { fetchCalculatedRoute } from '@/api/map';
+import { sendSelections } from '@/api/map';
 import { current } from '@reduxjs/toolkit';
+import { set } from 'mongoose';
 
 
 const Map = () => {
@@ -17,9 +19,17 @@ const Map = () => {
 
   //startNodeId in the Map component
   const [startNodeId, setStartNodeId] = useState(null);
+  // start node title
+  const [startNodeTitle, setStartNodeTitle] = useState(null);
+  // start node latLng
+  const [startNodeLatLng, setStartNodeLatLng] = useState([]);
 
   //endNodeId in the Map component
   const [endNodeId, setEndNodeId] = useState(null);
+  // end node title
+  const [endNodeTitle, setEndNodeTitle] = useState(null);
+  // end node latLng
+  const [endNodeLatLng, setEndNodeLatLng] = useState([]);
 
   const [open, setOpen] = useState(false);
 
@@ -33,11 +43,21 @@ const Map = () => {
   const getStartNodeId = (data) => [
     setStartNodeId(data)
   ]
+  // get the start node title and latLng
+  const getStartNodeTitleAndLatLng = (title, latLng) => {
+    setStartNodeTitle(title);
+    setStartNodeLatLng(latLng);
+  }
 
   //get the customer end point from the son component (MapWithGraph)
   const getEndNodeId = (data) => [
     setEndNodeId(data)
   ]
+  // get the end node title and latLng
+  const getEndNodeTitleAndLatLng = (title, latLng) => {
+    setEndNodeTitle(title);
+    setEndNodeLatLng(latLng);
+  }
 
   //4 strategy in the pull down
   const option = [
@@ -77,20 +97,38 @@ const Map = () => {
     }
 
     //using API put the start end point to the backend
-    //get the data then give the data to the MapWithGraph replace the graphData1 in the MapWithGraph component
 
     try {
-      const data = await fetchCalculatedRoute();
-      //setData(data);
-      console.log(data);
+      const bodyData = {
+        "start": {
+          "id": startNodeId,
+          "title": startNodeTitle,
+          "latLng": startNodeLatLng
+        },
+        "end": {
+          "id": endNodeId,
+          "title": endNodeTitle,
+          "latLng": endNodeLatLng
+        },
+        "profile": {
+          "difficulty": difficulty
+        }
+      };
+      const data = await sendSelections(bodyData);
+      console.log('response data:', data);
+      //get the data then give the data to the MapWithGraph replace the graphData1 in the MapWithGraph component
+      try {
+        const routes = await fetchCalculatedRoute();
+        //setData(data);
+        console.log(routes);
+        //the go to the step 2
+        setStep(2)
+      } catch (error) {
+        alert('Error fetching data:', error);
+      }
     } catch (error) {
-      //setError(error);
-      //setLoading(false);
-      alert('Error fetching data:', error);
+      alert('Error sending data:', error);
     }
-
-    //the go to the step 2
-    setStep(2)
   }
 
 
@@ -144,12 +182,16 @@ const Map = () => {
   const resetStartPoint = () => {
     childRef.current.resetStart();
     setStartNodeId(null)
+    setStartNodeTitle(null)
+    setStartNodeLatLng(null)
   }
 
   //use this function can clear the end point both the Map and MapWithGraph
   const resetEndPoint = () => {
     childRef.current.resetEnd();
     setEndNodeId(null)
+    setEndNodeTitle(null)
+    setEndNodeLatLng(null)
   }
 
   //description about the Tour box
@@ -199,6 +241,8 @@ const Map = () => {
             <MapWithGraph
               getStartNodeId={getStartNodeId}
               getEndNodeId={getEndNodeId}
+              getStartNodeTitleAndLatLng={getStartNodeTitleAndLatLng}
+              getEndNodeTitleAndLatLng={getEndNodeTitleAndLatLng}
               ref={childRef}
             />
           </MapContainer>
