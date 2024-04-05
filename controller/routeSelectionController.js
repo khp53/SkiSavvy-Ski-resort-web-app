@@ -59,11 +59,14 @@ class RouteSelectionController {
 
     async getFirstSelection(req, res) {
         try {
-            const selection = await this.SelectedRoute.findOne(); // if last one change this
-            return res.status(200).json({ statusCode: 200, message: 'Points retrieved successfully', data: selection });
+            const selections = await this.SelectedRoute.find(); // if last one change this later
+            const selection = selections[selections.length - 1]; // last one
+            //return res.status(200).json({ statusCode: 200, message: 'Points retrieved successfully', data: selection });
+            return selection;
         } catch (error) {
             console.error(error);
-            return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+            //return res.status(500).json({ statusCode: 500, message: 'Internal server error', data: null });
+            return null;
         }
     }
 }

@@ -1,3 +1,4 @@
+const PriorityQueue = require("../model/priorityQueue");
 class RouteOptions {
     constructor() {
         this.shortestPathLength = Infinity;
@@ -10,23 +11,99 @@ class RouteOptions {
         this.minLiftsPath = [];
     }
 
-    selectShortest(allPaths, shortestPath, graph) {
-        for (const path of allPaths) {
-            const pathIds = path.map(node => node.id);
-            const pathLength = shortestPath.reduce((totalLength, edge) => {
-                if (pathIds.includes(edge.id)) {
-                    return totalLength + edge.length;
+    selectShortest(allPaths, startNodeId, endNodeId, graph) {
+        const distances = {};
+        const previous = {};
+        const visited = new Set();
+        const queue = new PriorityQueue();
+
+        // Initialize distances
+        graph.nodes.forEach(node => {
+            distances[node.id] = Infinity;
+            previous[node.id] = null;
+        });
+        distances[startNodeId] = 0;
+
+        queue.enqueue(startNodeId, 0);
+
+        while (!queue.isEmpty()) {
+            const currentId = queue.dequeue().element;
+            visited.add(currentId);
+
+            if (currentId === endNodeId) {
+                break; // Found the shortest path
+            }
+
+            const neighbors = this.findNeighbors(currentId, allPaths);
+            for (const neighborId of neighbors) {
+                if (!visited.has(neighborId)) {
+                    const edge = this.findEdge(currentId, neighborId, allPaths);
+                    const weight = edge.type === "slope" ? edge.popup["additional-info"].length : 1;
+                    const distanceToNeighbor = distances[currentId] + weight;
+
+                    if (distanceToNeighbor < distances[neighborId]) {
+                        distances[neighborId] = distanceToNeighbor;
+                        previous[neighborId] = currentId;
+                        queue.enqueue(neighborId, distanceToNeighbor);
+                    }
                 }
-                return totalLength;
-            }, 0);
-            if (pathLength <= this.shortestPathLength) {
-                this.shortestPathLength = pathLength;
-                this.shortestPathRoute = path;
             }
         }
+
+        // Reconstruct the shortest path
+        const shortestPath = [];
+        let currentNode = endNodeId;
+        while (currentNode !== null) {
+            shortestPath.unshift(currentNode);
+            currentNode = previous[currentNode];
+        }
+
+        // Convert shortest path node IDs to node objects
+        const shortestPathRoute = shortestPath.map(nodeId => {
+            const node = graph.nodes.find(n => n.id === nodeId);
+            if (node) {
+                return {
+                    _id: node._id,
+                    id: node.id,
+                    title: node.title,
+                    latLng: node.latLng
+                };
+            } else {
+                return null;
+            }
+        }).filter(node => node !== null);
+
         // Shortest path description
-        const shortestPathDescription = this.findOptionalPathDescription(graph, this.shortestPathRoute, false, 0, false, 0);
-        return { shortestPath: this.shortestPathRoute, shortestPathDescription };
+        const shortestPathDescription = this.findOptionalPathDescription(graph, shortestPathRoute, false, 0, false, 0);
+        return { shortestPath: shortestPathRoute, shortestPathDescription };
+    }
+
+    findNeighbors(nodeId, allPaths) {
+        const neighbors = new Set();
+        allPaths.forEach(path => {
+            const index = path.findIndex(node => node.id === nodeId);
+            if (index !== -1) {
+                if (index > 0) {
+                    neighbors.add(path[index - 1].id);
+                }
+                if (index < path.length - 1) {
+                    neighbors.add(path[index + 1].id);
+                }
+            }
+        });
+        return Array.from(neighbors);
+    }
+
+    findEdge(sourceId, targetId, allPaths) {
+        return allPaths.find(path => {
+            for (let i = 0; i < path.length - 1; i++) {
+                if ((path[i].id === sourceId && path[i + 1].id === targetId) ||
+                    (path[i].id === targetId && path[i + 1].id === sourceId)) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     selectQuickest(allPaths, graph) {
