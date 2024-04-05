@@ -1,6 +1,9 @@
-const Resort = require('../model/skiResortModel');
+
+
+const RouteOptions = require('./routeOptions');
 class CRController {
     constructor() {
+        this.routeOptions = new RouteOptions();
     }
 
     // get the first ski resort by using skiResortController getTheFirstSkiResort method
@@ -17,7 +20,8 @@ class CRController {
             //const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
             const firstSkiResortString = JSON.stringify(firstSkiResort);
             const firstSkiResortParsed = JSON.parse(firstSkiResortString);
-            const routes = await this.calculateRoutes(firstSkiResortParsed, 28, 26, selectedRoute.profile);
+            let difficulties = [];
+            const routes = this.calculateRoutes(firstSkiResortParsed, 28, 26, difficulties);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);
@@ -26,14 +30,7 @@ class CRController {
     }
 
     // calculate all possible paths between the first ski resort and the first route
-    async calculateRoutes(data, startId, endId, profile) {
-        let difficulties = [];
-        let routes = this.findAllPaths(data, startId, endId, difficulties);
-        return routes;
-    }
-
-    findAllPaths(graph, startNodeId, endNodeId, difficulties, shortestPath = [], visited = new Set(), currentPath = [], allPaths = []) {
-
+    calculateRoutes(graph, startNodeId, endNodeId, difficulties, shortestPath = [], visited = new Set(), currentPath = [], allPaths = []) {
         // Check if graph.nodes array exists
         if (!graph.nodes || graph.nodes.length === 0) {
             return [];
@@ -64,7 +61,7 @@ class CRController {
                         if (edge.popup["additional-info"] && edge.popup["additional-info"].length) {
                             shortestPath.push({ id: edge.id, length: edge.popup["additional-info"].length });
                         }
-                        this.findAllPaths(graph, neighborId, endNodeId, difficulties, shortestPath.slice(), visited, currentPath.slice(), allPaths);
+                        this.calculateRoutes(graph, neighborId, endNodeId, difficulties, shortestPath.slice(), visited, currentPath.slice(), allPaths);
                         if (edge.popup["additional-info"] && edge.popup["additional-info"].length) {
                             shortestPath.pop();
                         }
@@ -73,122 +70,17 @@ class CRController {
             }
         }
 
-        // Remove current node from current path and mark it as unvisited
-        currentPath.pop();
-        visited.delete(startNodeId);
-
-        // Filter out shortest path based on edge lengths
-        let shortestPathLength = Infinity;
-        let shortestPathRoute = [];
-        for (const path of allPaths) {
-            const pathIds = path.map(node => node.id);
-            const pathLength = shortestPath.reduce((totalLength, edge) => {
-                if (pathIds.includes(edge.id)) {
-                    return totalLength + edge.length;
-                }
-                return totalLength;
-            }, 0);
-            if (pathLength <= shortestPathLength) {
-                shortestPathLength = pathLength;
-                shortestPathRoute = path;
-            }
-        }
-
-        // Filter out shortest time path
-        let shortestTime = Infinity;
-        let shortestTimeRoute = [];
-
-        for (const path of allPaths) {
-            let pathTime = 0;
-            for (let i = 0; i < path.length - 1; i++) {
-                const currentNode = path[i];
-                const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
-                if (edge) {
-                    if (edge.type === "lift") {
-                        pathTime += edge.time;
-                    } else {
-                        const speed = edge.speed;
-                        const length = edge.popup["additional-info"].length;
-                        pathTime += length / speed;
-                    }
-                }
-            }
-            if (pathTime < shortestTime) {
-                shortestTime = pathTime;
-                shortestTimeRoute = path;
-            }
-        }
-
-        // Filter out easiest path based on user difficulty levels
-        let easiestPathScore = Infinity;
-        let easiestPath = [];
-
-        for (const path of allPaths) {
-            let pathScore = 0;
-            let containsSlope = false;
-            for (let i = 0; i < path.length - 1; i++) {
-                const currentNode = path[i];
-                const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
-                if (edge && edge.type !== "lift") { // Consider only slope edges
-                    containsSlope = true;
-                    let multiplier = 1; // Default multiplier for easy difficulty
-                    if (difficulties.includes(edge.difficulty)) {
-                        if (edge.difficulty === "medium") {
-                            multiplier = 1.5; // Multiplier for medium difficulty
-                        } else if (edge.difficulty === "difficult") {
-                            multiplier = 2; // Multiplier for difficult difficulty
-                        }
-                    }
-                    const length = edge.popup["additional-info"].length;
-                    pathScore += length * multiplier;
-                }
-            }
-            if (containsSlope && pathScore < easiestPathScore) {
-                easiestPathScore = pathScore;
-                easiestPath = path;
-            }
-        }
-
-        // Find path with minimal lift usage
-        let minLiftsPath = [];
-        let minLiftsCount = Infinity;
-
-        for (const path of allPaths) {
-            let liftCount = 0;
-            for (let i = 0; i < path.length - 1; i++) {
-                const currentNode = path[i];
-                const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
-                if (edge && edge.type === "lift") {
-                    liftCount++;
-                }
-            }
-            if (liftCount < minLiftsCount) {
-                minLiftsCount = liftCount;
-                minLiftsPath = path;
-            }
-        }
+        const shortestPathRoute = this.routeOptions.selectShortest(allPaths, shortestPath, graph);
+        const shortestTimeRoute = this.routeOptions.selectQuickest(allPaths, graph);
+        const easiestPath = this.routeOptions.selectEasiest(allPaths, graph, difficulties);
+        const minLiftsPath = this.routeOptions.selectMinimalLiftUsage(allPaths, graph);
 
         // Generate text description for each path
         const pathsWithDescriptions = this.findAllPathDescriptions(graph, allPaths);
 
-        // Shortest path description
-        const shortestPathDescription = this.findOptionalPathDescription(graph, shortestPathRoute, false, 0, false, 0);
-
-        // Shortest time path description
-        const shortestTimeDescription = this.findOptionalPathDescription(graph, shortestTimeRoute, true, shortestTime);
-
-        // Easiest path description
-        const easiestPathDescription = this.findOptionalPathDescription(graph, easiestPath, false, 0, true, easiestPathScore);
-
-        // Minimal lifts path description
-        const minLiftsDescription = this.findOptionalPathDescription(graph, minLiftsPath, false, 0, false, 0);
-
         return {
-            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }, time: { shortestTimeRoute, shortestTimeDescription },
-            easy: { easiestPath, easiestPathDescription }, minLift: { minLiftsPath, minLiftsDescription }
+            all: { allPaths, pathsWithDescriptions }, short: shortestPathRoute, time: shortestTimeRoute,
+            easy: easiestPath, minLift: minLiftsPath
         };
     }
 
@@ -211,37 +103,6 @@ class CRController {
         });
         return pathsWithDescriptions;
     }
-
-    // Get the shortest path description
-    findOptionalPathDescription(graph, routes, isTime = false, time = 0, isEasiest = false, score = 0) {
-        const route = routes.map(node => node.title).join(" -> ");
-        const textDescription = routes.map((node, index) => {
-            if (index === 0) return `From Node ${node.title}`;
-            const prevNode = routes[index - 1];
-            const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
-            if (edge) {
-                if (edge.type === "lift") {
-                    return `take the ${edge.popup.title} lift to Node ${node.title}`;
-                } else {
-                    return `take the ${edge.popup.title} slope to Node ${node.title}`;
-                }
-            }
-        }).filter(description => description !== undefined).join(", ");
-        if (isTime) {
-            return { route, textDescription, time };
-        } else if (isEasiest) {
-            return { route, textDescription, score };
-        }
-        else {
-            return { route, textDescription };
-        }
-    }
 }
 
 module.exports = CRController;
-
-
-// adjust slope speed to 20 km/h
-// if user does not select a difficulty level dont incorporate it in the calculation.
-// filter out only one route based on user filter.
-// let user select another route if they want to.
