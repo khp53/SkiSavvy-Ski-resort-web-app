@@ -107,12 +107,21 @@ class RouteOptions {
     }
 
     selectQuickest(allPaths, graph) {
+        let shortestTime = Infinity;
+        let shortestTimeRoute = null;
+
         for (const path of allPaths) {
             let pathTime = 0;
+
             for (let i = 0; i < path.length - 1; i++) {
                 const currentNode = path[i];
                 const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+                const edge = graph.edges.find(edge =>
+                    edge.direction &&
+                    edge.direction.source === currentNode.id &&
+                    edge.direction.target === nextNode.id
+                );
+
                 if (edge) {
                     if (edge.type === "lift") {
                         pathTime += edge.time;
@@ -123,14 +132,16 @@ class RouteOptions {
                     }
                 }
             }
-            if (pathTime < this.shortestTime) {
-                this.shortestTime = pathTime;
-                this.shortestTimeRoute = path;
+
+            if (pathTime < shortestTime) {
+                shortestTime = pathTime;
+                shortestTimeRoute = path;
             }
         }
+
         // Quickest path description
-        const quickestPathDescription = this.findOptionalPathDescription(graph, this.shortestTimeRoute, true, this.shortestTime, false, 0);
-        return { quickestPath: this.shortestTimeRoute, quickestPathDescription };
+        const quickestPathDescription = this.findOptionalPathDescription(graph, shortestTimeRoute, true, shortestTime, false, 0);
+        return { quickestPath: shortestTimeRoute, quickestPathDescription };
     }
 
     selectEasiest(allPaths, graph, difficulties) {
@@ -178,24 +189,35 @@ class RouteOptions {
     }
 
     selectMinimalLiftUsage(allPaths, graph) {
+        let minLiftsCount = Infinity;
+        let minLiftsPath = null;
+
         for (const path of allPaths) {
             let liftCount = 0;
+
             for (let i = 0; i < path.length - 1; i++) {
                 const currentNode = path[i];
                 const nextNode = path[i + 1];
-                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+                const edge = graph.edges.find(edge =>
+                    edge.direction &&
+                    edge.direction.source === currentNode.id &&
+                    edge.direction.target === nextNode.id
+                );
+
                 if (edge && edge.type === "lift") {
                     liftCount++;
                 }
             }
-            if (liftCount < this.minLiftsCount) {
-                this.minLiftsCount = liftCount;
-                this.minLiftsPath = path;
+
+            if (liftCount < minLiftsCount) {
+                minLiftsCount = liftCount;
+                minLiftsPath = path;
             }
         }
+
         // Minimal lift usage path description
-        const minLiftsPathDescription = this.findOptionalPathDescription(graph, this.minLiftsPath, false, 0, false, 0);
-        return { minLiftsPath: this.minLiftsPath, minLiftsPathDescription };
+        const minLiftsPathDescription = this.findOptionalPathDescription(graph, minLiftsPath, false, 0, false, 0);
+        return { minLiftsPath, minLiftsPathDescription };
     }
 
     // Get the shortest path description
