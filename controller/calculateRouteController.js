@@ -17,7 +17,7 @@ class CRController {
             //const routes = await this.calculateRoutes(firstSkiResort, selectedRoute.start, selectedRoute.end, selectedRoute.profile);
             const firstSkiResortString = JSON.stringify(firstSkiResort);
             const firstSkiResortParsed = JSON.parse(firstSkiResortString);
-            const routes = await this.calculateRoutes(firstSkiResortParsed, 1, 7, selectedRoute.profile);
+            const routes = await this.calculateRoutes(firstSkiResortParsed, 31, 33, selectedRoute.profile);
             return res.status(200).json({ statusCode: 200, message: 'All paths calculated successfully', data: routes });
         } catch (error) {
             console.error(error);
@@ -27,11 +27,12 @@ class CRController {
 
     // calculate all possible paths between the first ski resort and the first route
     async calculateRoutes(data, startId, endId, profile) {
-        let routes = this.findAllPaths(data, startId, endId);
+        let difficulties = ["difficult"];
+        let routes = this.findAllPaths(data, startId, endId, difficulties);
         return routes;
     }
 
-    findAllPaths(graph, startNodeId, endNodeId, shortestPath = [], visited = new Set(), currentPath = [], allPaths = []) {
+    findAllPaths(graph, startNodeId, endNodeId, difficulties, shortestPath = [], visited = new Set(), currentPath = [], allPaths = []) {
 
         // Check if graph.nodes array exists
         if (!graph.nodes || graph.nodes.length === 0) {
@@ -57,8 +58,8 @@ class CRController {
             const edges = graph.edges.filter(edge => edge.direction && edge.direction.source === startNodeId);
             for (const edge of edges) {
                 const neighborId = edge.direction.target;
-                if (!visited.has(neighborId)) {
-                    this.findAllPaths(graph, neighborId, endNodeId, shortestPath, visited, currentPath, allPaths);
+                if (!visited.has(neighborId) && difficulties.includes(edge.difficulty)) {
+                    this.findAllPaths(graph, neighborId, endNodeId, difficulties, shortestPath, visited, currentPath, allPaths);
                 }
             }
         }
@@ -66,18 +67,6 @@ class CRController {
         // Remove current node from current path and mark it as unvisited
         currentPath.pop();
         visited.delete(startNodeId);
-
-        // Check if the current path is part of the shortest path
-        const pathEdges = allPaths[allPaths.length - 1]; // Last path added to allPaths
-        if (pathEdges && shortestPath.length > 0) {
-            pathEdges.forEach(pathEdge => {
-                if (shortestPath.find(shortestPathEdge => shortestPathEdge.id === pathEdge.id)) {
-                    pathEdge.highlighted = true;
-                } else {
-                    pathEdge.highlighted = false;
-                }
-            });
-        }
 
         return allPaths.map(path => {
             const route = path.map(node => node.title).join(" -> ");
