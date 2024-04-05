@@ -6,8 +6,6 @@ class SkiResortController {
         this.SkiResort = this.skiResort.getResortModel();
         this.getTheFirstSkiResort = this.getTheFirstSkiResort.bind(this);
         this.getFirstSkiResortData = this.getFirstSkiResortData.bind(this);
-        this.getAllSkiResorts = this.getAllSkiResorts.bind(this);
-        this.getSkiResortById = this.getSkiResortById.bind(this);
     }
 
     async getTheFirstSkiResort(req, res) {
