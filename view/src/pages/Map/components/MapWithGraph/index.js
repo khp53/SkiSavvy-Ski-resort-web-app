@@ -6,6 +6,7 @@ import imageUrl from '@/assets/map_bg.svg'
 import imageUrl1 from '@/assets/resortBackground.jpg'
 import 'leaflet/dist/leaflet.css';
 import { fetchMapData } from '@/api/map';
+import route from '@/route';
 
 
 const MapWithGraph = forwardRef((props, ref) => {
@@ -1017,11 +1018,11 @@ const MapWithGraph = forwardRef((props, ref) => {
                 node.id === startNodeId || node.id === endNodeId ?
                     L.divIcon({
                         className: 'custom-icon',
-                        html: `<div style="background-color: #AB03FA; border-radius: 100%; height: 10px; width: 10px;"></div>`,
+                        html: `<div style="background-color: #FA8D03; border-radius: 100%; height: 10px; width: 10px;"></div>`,
                     }) :
                     L.divIcon({
                         className: 'custom-icon',
-                        html: `<div style="background-color: #FA8D03; border-radius: 100%; height: 10px; width: 10px;"></div>`,
+                        html: `<div style="background-color: grey; border-radius: 100%; height: 10px; width: 10px;"></div>`,
                     })
             );
             // Add popup for the node on mouseover
@@ -1077,14 +1078,6 @@ const MapWithGraph = forwardRef((props, ref) => {
                 color = 'green';
             }
 
-            // Check if the current edge is in the provided paths
-            let matchingPath = null
-            if (routes) {
-                matchingPath = routes.data.all.allPaths.find(path => {
-                    return path.some(node => node.id === edge.source) && path.some(node => node.id === edge.target);
-                });
-            }
-
             // Create a curved line if it's not a "lift" edge
             const curve = !isLiftEdge && edge.isMultipleEdges === true ?
                 L.curve(
@@ -1092,9 +1085,9 @@ const MapWithGraph = forwardRef((props, ref) => {
                         'M', latLngs[0],
                         'Q', midpointLatLng, latLngs[1],
                     ],
-                    { color: matchingPath ? 'blue' : color, weight: 3 }
+                    { color: color, weight: 3 }
                 ) :
-                L.polyline(latLngs, { color: matchingPath ? 'blue' : color, weight: 3 });
+                L.polyline(latLngs, { color: color, weight: 3 });
 
             curve.addTo(map);
 

@@ -48,11 +48,11 @@ class CRController {
         currentPath.push(currentNode);
 
         visited.add(startNodeId);
-
+        let edges;
         if (startNodeId === endNodeId) {
             allPaths.push([...currentPath]);
         } else {
-            const edges = graph.edges.filter(edge => edge.direction && edge.direction.source === startNodeId);
+            edges = graph.edges.filter(edge => edge.direction && edge.direction.source === startNodeId);
             for (const edge of edges) {
                 const neighborId = edge.direction.target;
                 if (!visited.has(neighborId)) {
