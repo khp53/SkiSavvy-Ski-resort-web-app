@@ -28,7 +28,6 @@ const Map = () => {
   //alert no startpoint or endpoint
   const [messageApi, contextHolder] = message.useMessage()
 
-
   //get the customer start point from the son component (MapWithGraph)
   const getStartNodeId = (data) => [
     setStartNodeId(data)
@@ -187,7 +186,7 @@ const Map = () => {
       {/* <ChooseSlopeDifficulty chooseDifficulty={chooseDifficulty} isDifficultyFinish={isDifficultyFinish} /> */}
       <Row justify='space-around'>
         <Col xs={22} sm={22} md={16} lg={16}>
-          <MapContainer center={[66, 375]} zoom={2} style={{ height: '60vw', width: '100%' }}>
+          <MapContainer center={[66, 375]} zoom={2} style={{ height: '40vw', width: '100%' }}>
             <MapWithGraph
               getStartNodeId={getStartNodeId}
               getEndNodeId={getEndNodeId}
