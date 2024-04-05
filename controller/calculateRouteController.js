@@ -120,17 +120,52 @@ class CRController {
             }
         }
 
+        // Filter out easiest path based on user difficulty levels
+        let easiestPathScore = Infinity;
+        let easiestPath = [];
+
+        for (const path of allPaths) {
+            let pathScore = 0;
+            let containsSlope = false;
+            for (let i = 0; i < path.length - 1; i++) {
+                const currentNode = path[i];
+                const nextNode = path[i + 1];
+                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+                if (edge && edge.type !== "lift") { // Consider only slope edges
+                    containsSlope = true;
+                    let multiplier = 1; // Default multiplier for easy difficulty
+                    if (difficulties.includes(edge.difficulty)) {
+                        if (edge.difficulty === "medium") {
+                            multiplier = 1.5; // Multiplier for medium difficulty
+                        } else if (edge.difficulty === "difficult") {
+                            multiplier = 2; // Multiplier for difficult difficulty
+                        }
+                    }
+                    const length = edge.popup["additional-info"].length;
+                    pathScore += length * multiplier;
+                }
+            }
+            if (containsSlope && pathScore < easiestPathScore) {
+                easiestPathScore = pathScore;
+                easiestPath = path;
+            }
+        }
+
         // Generate text description for each path
         const pathsWithDescriptions = this.findAllPathDescriptions(graph, allPaths);
 
         // Shortest path description
-        const shortestPathDescription = this.findOptionalPathDescription(graph, shortestPathRoute);
+        const shortestPathDescription = this.findOptionalPathDescription(graph, shortestPathRoute, false, 0, false, 0);
 
         // Shortest time path description
         const shortestTimeDescription = this.findOptionalPathDescription(graph, shortestTimeRoute, true, shortestTime);
 
+        // Easiest path description
+        const easiestPathDescription = this.findOptionalPathDescription(graph, easiestPath, false, 0, true, easiestPathScore);
+
         return {
-            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }, time: { shortestTimeRoute, shortestTimeDescription }
+            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }, time: { shortestTimeRoute, shortestTimeDescription },
+            easy: { easiestPath, easiestPathDescription }
         };
     }
 
@@ -155,7 +190,7 @@ class CRController {
     }
 
     // Get the shortest path description
-    findOptionalPathDescription(graph, routes, isTime = false, time = 0) {
+    findOptionalPathDescription(graph, routes, isTime = false, time = 0, isEasiest = false, score = 0) {
         const route = routes.map(node => node.title).join(" -> ");
         const textDescription = routes.map((node, index) => {
             if (index === 0) return `From Node ${node.title}`;
@@ -171,7 +206,10 @@ class CRController {
         }).filter(description => description !== undefined).join(", ");
         if (isTime) {
             return { route, textDescription, time };
-        } else {
+        } else if (isEasiest) {
+            return { route, textDescription, score };
+        }
+        else {
             return { route, textDescription };
         }
     }
