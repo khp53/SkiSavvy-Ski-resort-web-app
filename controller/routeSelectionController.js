@@ -9,8 +9,7 @@ class RouteSelectionController {
     async insertSelection(req, res) {
         if (!req.body || !req.body.start || !req.body.end || !req.body.profile ||
             !req.body.start.id || !req.body.start.title || !req.body.start.latLng ||
-            !req.body.end.id || !req.body.end.title || !req.body.end.latLng ||
-            !req.body.profile.difficulty) {
+            !req.body.end.id || !req.body.end.title || !req.body.end.latLng) {
             return res.status(400).json({ statusCode: 400, message: 'Invalid or incomplete request body', data: null });
         }
 
@@ -18,7 +17,7 @@ class RouteSelectionController {
 
         if (typeof start.id !== 'number' || typeof start.title !== 'string' || !Array.isArray(start.latLng) || start.latLng.length !== 2 ||
             typeof end.id !== 'number' || typeof end.title !== 'string' || !Array.isArray(end.latLng) || end.latLng.length !== 2 ||
-            typeof profile.difficulty !== 'string') {
+            !Array.isArray(profile.difficulty)) {
             return res.status(400).json({ statusCode: 400, message: 'Invalid data format in request body', data: null });
         }
 
