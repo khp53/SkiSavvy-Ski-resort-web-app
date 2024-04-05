@@ -94,14 +94,43 @@ class CRController {
             }
         }
 
+        // Filter out shortest time path
+        let shortestTime = Infinity;
+        let shortestTimeRoute = [];
+
+        for (const path of allPaths) {
+            let pathTime = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                const currentNode = path[i];
+                const nextNode = path[i + 1];
+                const edge = graph.edges.find(edge => edge.direction && edge.direction.source === currentNode.id && edge.direction.target === nextNode.id);
+                if (edge) {
+                    if (edge.type === "lift") {
+                        pathTime += edge.time;
+                    } else {
+                        const speed = edge.speed;
+                        const length = edge.popup["additional-info"].length;
+                        pathTime += length / speed;
+                    }
+                }
+            }
+            if (pathTime < shortestTime) {
+                shortestTime = pathTime;
+                shortestTimeRoute = path;
+            }
+        }
+
         // Generate text description for each path
         const pathsWithDescriptions = this.findAllPathDescriptions(graph, allPaths);
 
         // Shortest path description
-        const shortestPathDescription = this.findShortestPathDescription(graph, shortestPathRoute);
+        const shortestPathDescription = this.findOptionalPathDescription(graph, shortestPathRoute);
+
+        // Shortest time path description
+        const shortestTimeDescription = this.findOptionalPathDescription(graph, shortestTimeRoute, true, shortestTime);
 
         return {
-            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }
+            all: { allPaths, pathsWithDescriptions }, short: { shortestPathRoute, shortestPathDescription }, time: { shortestTimeRoute, shortestTimeDescription }
         };
     }
 
@@ -126,11 +155,11 @@ class CRController {
     }
 
     // Get the shortest path description
-    findShortestPathDescription(graph, shortestPathRoute) {
-        const route = shortestPathRoute.map(node => node.title).join(" -> ");
-        const textDescription = shortestPathRoute.map((node, index) => {
+    findOptionalPathDescription(graph, routes, isTime = false, time = 0) {
+        const route = routes.map(node => node.title).join(" -> ");
+        const textDescription = routes.map((node, index) => {
             if (index === 0) return `From Node ${node.title}`;
-            const prevNode = shortestPathRoute[index - 1];
+            const prevNode = routes[index - 1];
             const edge = graph.edges.find(edge => edge.direction.source === prevNode.id && edge.direction.target === node.id);
             if (edge) {
                 if (edge.type === "lift") {
@@ -140,11 +169,16 @@ class CRController {
                 }
             }
         }).filter(description => description !== undefined).join(", ");
-        return { route, textDescription };
+        if (isTime) {
+            return { route, textDescription, time };
+        } else {
+            return { route, textDescription };
+        }
     }
 }
 
 module.exports = CRController;
+
 
 // adjust slope speed to 20 km/h
 // if user does not select a difficulty level dont incorporate it in the calculation.
