@@ -1,4 +1,5 @@
 # skisavvy_group_11
+# For Iteration 3 Please refer to iteration_3 branch
 
 ## How to run node server
 
@@ -21,19 +22,33 @@ Or you can click on the run button on eclipse.
 At http://localhost:4000 the project has been deployed.
 
 To access Calculate Route use case:
-1. From home page click on Calculate Route button on the nav bar.
-2. It should automatically fetch the map data from mongo db using "localhost:4000/api/resort" REST API.
-3. After the map data finished loading the system will ask user for start point.
-4. After start point has been selected, the system should prompt the user for the end point.
-5. Next The system will ask the user to input there difficulty.
-6. On the right side of the map the difficulty selection drop-down should be presented by the system.
-7. After a difficulty has been choosen, the system will then calculate all possible routes to the destination point.
-8. After route calculation, the system will show the route and mark them will appropriate color.
-9. The system will also prompt the user if they want they can choose from different route options.
-10. The system will present user with route choice drop-down.
-11. The route difficulty and route type information can be display by user when they hover over the routes.
-12. The points or node types or names can be displayed by the user when they hover over the nodes.
-13. Finally to restart or reselect routes there will be a green reset button at the bottom.
+Note: User has to first go to calculate route page from home screen nav bar.
+1. The SkiSavvy application provides Skiers with an overview of the ski area.
+2. The SkiSavvy application requests Skier provide a start location.
+3. The skier selects the start location.
+4. The SkiSavvy application requests the Skier to provide an
+end location.
+5. The skier selects the end location.
+6. The SkiSavvy application requests the Skier to provide info
+about acceptable slope difficulty levels.
+7. The skier enters slope restrictions.
+7a. The skier requests the SkiSavvy application to use Skier’s stored profile.
+7b. The SkiSavvy application retrieves Skier’s profile and uses it to determine acceptable difficulty level.
+7b.1 No profile is available.
+7b.2 SkiSavvy application informs Skier about missing profile. Use Case resumes at step 7.
+8. The application prompts user to calculate route.
+9. The skier clicks on calculate route.
+10. The SkiSavvy application calculates possible routes to the
+requested destination (based on restrictions).
+11. The application displays all possible paths below map.
+12. SkiSavvy application requests the Skier to select a route
+based on indicated criteria (e.g., fastest, longest, easiest,
+minimum lift usage)
+13. The skier selects one of the options.
+14. The SkiSavvy application displays the desired route (based
+on the selected criteria).
+15. The application displays path based on criteria under map.
+16. The application offers the skier to reset all options or to go back to the previous route.
 
 
 
