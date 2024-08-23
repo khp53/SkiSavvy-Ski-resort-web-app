@@ -19,8 +19,6 @@ Or you can click on the run button on eclipse.
 
 ## Front-end
 
-At http://localhost:4000 the project has been deployed.
-
 To access Calculate Route use case:
 Note: User has to first go to calculate route page from home screen nav bar.
 1. The SkiSavvy application provides Skiers with an overview of the ski area.
